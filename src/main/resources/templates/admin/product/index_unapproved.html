@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/fragments/head :: head">
+    <title>Sản phẩm chưa duyệt</title>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+        <div th:replace="admin/fragments/header :: header"></div>
+        <div th:replace="admin/fragments/sidebar :: sidebar"></div>
+
+        <div class="content-wrapper">
+            <section class="content-header">
+                <h1>Sản phẩm chưa duyệt <small>Quản lý các sản phẩm chưa duyệt</small></h1>
+                <ol class="breadcrumb">
+                    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+                    <li class="active">Sản phẩm chưa duyệt</li>
+                </ol>
+            </section>
+
+            <section class="content">
+                <div class="box">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Danh sách sản phẩm chưa duyệt</h3>
+                    </div>
+                    <div class="box-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Mã</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Trạng thái</th>
+                                    <th>Giá</th>
+                                    <th>Số lượng</th>
+                                    <th>Danh mục</th>
+                                    <th>Ảnh</th>
+                                    <th>Lựa chọn</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="product : ${unapprovedProducts}">
+                                    <td th:text="${product.id}"></td>
+                                    <td th:text="${product.name}"></td>
+                                    <td>
+                                        <span th:if="${product.status == 1}" class="label label-success">Còn kinh doanh</span>
+                                        <span th:if="${product.status == 0}" class="label label-danger">Hết kinh doanh</span>
+                                    </td>
+                                    <td th:text="${product.price}"></td>
+                                    <td th:text="${product.quantity}"></td>
+                                    <td th:text="${product.category.name}"></td>
+                                    <td>
+                                        <img th:if="${product.imageUrl != null}" th:src="@{${product.imageUrl}}" width="100px" alt="Product Image">
+                                        <span th:if="${product.imageUrl == null}">No Image</span>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{/admin/approve-product/{id}(id=${product.id})}" class="btn btn-primary">Duyệt</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="box-footer clearfix">
+                        <ul class="pagination pagination-sm no-margin pull-right">
+                            <li th:classappend="${currentUnapprovedPage == 0} ? 'disabled'">
+                                <a th:href="@{/admin/products/unapproved(page=${currentUnapprovedPage - 1})}" th:if="${currentUnapprovedPage > 0}">«</a>
+                            </li>
+                            <li th:each="pageNum : ${#numbers.sequence(0, totalUnapprovedPages - 1)}"
+                                th:classappend="${pageNum == currentUnapprovedPage} ? 'active'">
+                                <a th:href="@{/admin/products/unapproved(page=${pageNum})}" th:text="${pageNum + 1}"></a>
+                            </li>
+                            <li th:classappend="${currentUnapprovedPage == totalUnapprovedPages - 1} ? 'disabled'">
+                                <a th:href="@{/admin/products/unapproved(page=${currentUnapprovedPage + 1})}" th:if="${currentUnapprovedPage < totalUnapprovedPages - 1}">»</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div th:replace="admin/fragments/footer :: footer"></div>
+    </div>
+
+    <div th:replace="admin/fragments/script :: script"></div>
+</body>
+</html>

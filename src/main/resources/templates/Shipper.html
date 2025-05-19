@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Trang quản lý đơn hàng dành cho người bán"/>
+    <meta name="keywords" content="admin, dashboard, vendor, order management"/>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <title>Quản lý vận chuyển hàng hóa</title>
+
+    <style>
+        .custom-navbar {
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        .custom-navbar .navbar-brand {
+            font-size: 32px;
+            font-weight: 600;
+        }
+
+        .custom-navbar .navbar-brand span {
+            color: #3b5d50;
+        }
+
+        .custom-navbar-nav .nav-link {
+            font-weight: 500;
+            color: #ffffff !important;
+            opacity: 0.5;
+            transition: .3s all ease;
+        }
+
+        .custom-navbar-nav .nav-link:hover,
+        .custom-navbar-nav .nav-link.active {
+            opacity: 1;
+        }
+
+        .dashboard-content {
+            padding: 2rem;
+        }
+
+        /* Các nút trạng thái */
+        .product-status-btn {
+            font-weight: 600;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            transition: 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .product-status-btn i {
+            font-size: 18px;
+        }
+
+        .product-status-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .product-status-btn:focus {
+            outline: none;
+        }
+
+        .product-status-btn i {
+            margin-right: 8px;
+        }
+
+        /* Màu sắc các nút */
+        .btn-hien-co {
+            border: 1px solid #ff9800;
+            color: #ff9800;
+        }
+
+        .btn-hoan-thanh {
+            border: 1px solid #28a745;
+            color: #28a745;
+        }
+
+        /* Điều chỉnh Responsive */
+        @media (max-width: 768px) {
+            .btn-group {
+                flex-direction: column;
+                gap: 10px; /* Khoảng cách khi thu nhỏ màn hình */
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        .btn-group .btn {
+            margin-right: 10px; /* Thêm khoảng cách bên phải cho nút */
+        }
+
+        /* Cách khác là bạn có thể thêm khoảng cách trực tiếp cho nút Nhận Giao */
+        .btn-group .btn-primary:not(:last-child) {
+            margin-right: 10px; /* Thêm khoảng cách chỉ cho nút đầu tiên */
+        }
+
+        .btn-da-giao {
+            border: 1px solid #198754;
+            color: #198754;
+        }
+
+        .btn-da-giao:hover {
+            background-color: #198754;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+<!-- Start Header/Navigation -->
+<nav class="custom-navbar navbar navbar-expand-md navbar-dark bg-dark"
+     aria-label="Vendor order management navigation bar">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">Shipper Delivery<span>.</span></a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsVendor"
+                aria-controls="navbarsVendor" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarsVendor">
+            <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="/shipper"><i class="fas fa-home me-2"></i>Trang Chủ</a>
+                </li>
+                
+                <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+		        <li class="nav-item">
+		          <a class="nav-link" href="/users/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+		        </li>
+		      </ul>	
+            </ul>
+        </div>
+    </div>
+</nav>
+<!-- End Header/Navigation -->
+
+<!-- Start Product Management Content -->
+<div class="dashboard-content">
+    <div class="container">
+        <h2>Quản lý đơn vận chuyển</h2>
+
+        <!-- Filter Buttons -->
+        <div class="d-flex justify-content-start mb-4">
+            <a href="/shipper/remaining_orders" class="btn product-status-btn btn-hien-co">
+                <i class="fas fa-box-open me-2"></i>Đơn hàng đang chờ giao
+            </a>
+            <a href="/shipper/in-progress-orders" class="btn product-status-btn btn-da-giao">
+		        <i class="fas fa-shipping-fast me-2"></i>Đơn hàng được duyệt đi giao
+		    </a>
+            <a href="/shipper/confirmed-orders" class="btn product-status-btn btn-hoan-thanh">
+                <i class="fas fa-check-circle me-2"></i>Xác nhận đã giao
+            </a>
+            
+        </div>
+
+        <!-- Start Order List -->
+        <div th:if="${orders != null and !orders.isEmpty()}">
+            <div class="list-group">
+                <!-- Lặp qua danh sách đơn hàng -->
+                <div th:each="order, iterStat : ${orders}" class="list-group-item">
+                    <h5>Mã đơn hàng: <span th:text="${order.id}"></span></h5>
+                    <p><strong>Khách hàng:</strong> <span th:text="${order.user.username}"></span></p>
+                    <p><strong>Ngày tạo:</strong> <span th:text="${formattedDates[iterStat.index]}"></span></p>
+					 <p><strong>Phương thức thanh toán:</strong> <span th:text="${order.paymentMethod}"></span></p>
+					 <p><strong>Tổng tiền cần thu:</strong>
+						<span th:if="${paymentMethod[iterStat.index] == 'COD'}" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'">VND</span>
+						<span th:if="${paymentMethod[iterStat.index] == 'BANK'}" th:text="${#numbers.formatDecimal(0, 0, 'COMMA', 0, 'POINT')} + ' VND'">VND</span>
+					</p>
+                    <!-- Hiển thị địa chỉ mặc định -->
+                    <p><strong>Địa chỉ:</strong>
+                        <span th:if="${defaultAddresses != null and defaultAddresses[iterStat.index] != null}">
+				    <span th:text="${defaultAddresses[iterStat.index].streetAddress}"></span>, 
+				    <span th:text="${defaultAddresses[iterStat.index].city}"></span>, 
+				    <span th:text="${defaultAddresses[iterStat.index].country}"></span>
+				  </span>
+                    </p>
+
+                    <p><strong>Trạng thái:</strong> <span th:text="${order.status}"></span></p>
+                    <p><strong>Số điện thoại:</strong> <span th:text="${phoneNumbers[iterStat.index]}"></span></p>
+                    <!-- Hiển thị số điện thoại -->
+
+                    <!-- Nút Chi Tiết luôn hiển thị -->
+                    <div class="btn-group" role="group" aria-label="Order Actions">
+                        <!-- Nút Nhận Giao, chỉ hiển thị nếu trạng thái là 'Đã xác nhận' -->
+                        <a th:if="${order.status == 'Đã xác nhận'}"
+                           href="javascript:void(0);"
+                           class="btn btn-primary"
+                           th:onclick="|receiveOrder(${order.id})|">
+                            <i class="fas fa-truck"></i> Nhận Giao
+                        </a>
+
+                        <!-- New Hoàn Thành button -->
+                        <a th:if="${order.status == 'Đã nhận hàng'}"
+                           href="javascript:void(0);"
+                           class="btn btn-success"
+                           th:onclick="|completeOrder(${order.id})|">
+                            <i class="fas fa-check"></i> Xác nhận giao xong
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Order List -->
+
+
+    </div>
+</div>
+<!-- End Product Management Content -->
+
+<!-- Bootstrap JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+
+
+<script>
+    function receiveOrder(orderId) {
+        // Giả sử shipperId lấy từ session hoặc từ API
+        let shipperId = '[[${session.user0}]]';
+
+        // Gửi yêu cầu đến backend để tạo thông báo mới
+        fetch('/shipper/createNotification', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                orderId: orderId,    // Mã đơn hàng
+                shipperId: shipperId, // Mã shipper
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Đã gửi tới chủ shop thành công, chờ người ta duyệt cho bạn đi giao nhé!');
+                    window.location.reload();
+                } else {
+                    alert('Có lỗi xảy ra khi tạo thông báo.');
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi gửi thông báo:', error);
+            });
+    }
+
+    function completeOrder(orderId) {
+        fetch('/shipper/complete-order/' + orderId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    // Optionally refresh the page or update the UI to reflect the changes
+                    window.location.reload();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Có lỗi xảy ra. Vui lòng thử lại.");
+            });
+    }
+
+
+</script>
+</body>
+</html>

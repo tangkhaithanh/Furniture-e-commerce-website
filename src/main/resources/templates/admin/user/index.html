@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/fragments/head :: head">
+    <title>Danh sách người dùng</title>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+        <div th:replace="admin/fragments/header :: header"></div>
+        <div th:replace="admin/fragments/sidebar :: sidebar"></div>
+
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Content Header -->
+            <section class="content-header">
+                <h1>
+                    Danh sách người dùng <small>Quản lý người dùng trong hệ thống</small>
+                </h1>
+                <ol class="breadcrumb">
+                    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+                    <li><a href="#">Quản lý người dùng</a></li>
+                    <li class="active">Danh sách người dùng</li>
+                </ol>
+            </section>
+
+            <!-- Main Content -->
+            <section class="content">
+                <div class="box">
+                    <div class="box-header with-border">
+                       <a class="btn btn-success" href="/admin/add-user">Thêm mới người dùng</a>
+                        <form method="get" th:action="@{/admin/admin_users}" class="form-inline pull-right">
+                            <input type="text" class="form-control" name="keyword" 
+                                   th:value="${keyword}" placeholder="Tìm kiếm theo email hoặc tên đăng nhập" style="width: 300px;">
+                            <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                        </form>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10px">Mã</th>
+                                    <th>Email</th>
+                                    <th>Tên đăng nhập</th>
+                                    <th>Vai trò</th>
+                                    <th>Trạng thái</th>
+                                    <th>Lựa chọn</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="user : ${users}">
+                                    <td th:text="${user.userId}"></td>
+                                    <td th:text="${user.email}"></td>
+                                    <td th:text="${user.username}"></td>
+                                    <td th:text="${user.role.getName()}"></td>
+                                    <td>
+                                        <span th:if="${user.isActive}" class="label label-success">Đang hoạt động</span>
+                                        <span th:if="${!user.isActive}" class="label label-danger">Tạm khóa</span>
+                                    </td>
+                                    <td>
+	                                    <a th:href="@{/admin/edit-user/{id}(id=${user.userId})}" class="btn btn-success">Chỉnh sửa</a>
+                                        <a th:href="@{/admin/delete-user/{id}(id=${user.userId})}" class="btn btn-danger" onclick="return confirm('Bạn chắc chắn muốn xóa người dùng này?')">Xóa</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+                    <div class="box-footer clearfix">
+                        <ul class="pagination pagination-sm no-margin pull-right">
+                            <!-- Nút "Trước" -->
+                            <li th:classappend="${currentPage == 0} ? 'disabled'">
+                                <a th:href="@{/admin/admin_users(page=${currentPage - 1}, keyword=${keyword})}" th:if="${currentPage > 0}">«</a>
+                            </li>
+                            <!-- Trang -->
+                            <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                                th:classappend="${pageNum == currentPage} ? 'active'">
+                                <a th:href="@{/admin/admin_users(page=${pageNum}, keyword=${keyword})}" th:text="${pageNum + 1}"></a>
+                            </li>
+                            <!-- Nút "Tiếp" -->
+                            <li th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                <a th:href="@{/admin/admin_users(page=${currentPage + 1}, keyword=${keyword})}" th:if="${currentPage < totalPages - 1}">»</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+
+        <div th:replace="admin/fragments/footer :: footer"></div>
+    </div>
+
+    <div th:replace="admin/fragments/script :: script"></div>
+</body>
+</html>

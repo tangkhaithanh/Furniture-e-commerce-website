@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Quản lý Đơn hàng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dep.css">
+    <!-- Kết nối với Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <style>
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(44, 62, 80, 0.95) !important; /* Thêm độ trong suốt nhẹ */
+            backdrop-filter: blur(10px); /* Hiệu ứng blur cho background */
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* Màu nền gradient và hiệu ứng */
+        body {
+            background: linear-gradient(135deg, #f6f8f9 0%, #e5ebee 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Tùy chỉnh thanh điều hướng */
+        .nav-buttons a {
+            margin-right: 15px;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 30px;
+            background-color: #6A5ACD; /* Màu tím xanh */
+            color: white;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-buttons a:hover {
+            background-color: #483D8B;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Cập nhật CSS cho các đơn hàng */
+        .order-card {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .order-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, #6A5ACD, #00CED1);
+        }
+
+        .order-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Ảnh sản phẩm với hiệu ứng */
+        .order-img {
+            max-width: 100px;
+            border-radius: 12px;
+            margin-right: 15px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-img:hover {
+            transform: scale(1.1);
+        }
+
+        /* Cải tiến các phần chi tiết */
+        .order-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #f1f1f1;
+            padding: 15px 0;
+        }
+
+        .order-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-grow: 1;
+        }
+
+        .order-header {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .order-body {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .order-quantity {
+            font-size: 14px;
+            color: #333;
+            background-color: #f0f0f0;
+            padding: 3px 8px;
+            border-radius: 15px;
+            display: inline-block;
+        }
+
+        .order-item-total {
+            font-size: 16px;
+            font-weight: bold;
+            color: #6A5ACD;
+        }
+
+        .order-total {
+            font-size: 20px;
+            font-weight: bold;
+            color: #6A5ACD;
+            margin-top: 20px;
+            text-align: right;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Nút trả hàng được cải tiến */
+        .order-return-button {
+            padding: 10px 20px;
+            background-color: #20B2AA; /* Màu xanh lam nhạt */
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .order-return-button:hover {
+            background-color: #008B8B;
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .order-return-button.disabled {
+            background-color: #A9A9A9;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .order-status {
+            font-size: 16px;
+            font-weight: 500;
+            color: #20B2AA;
+            margin-top: 10px;
+        }
+
+        .order-status.cancelled {
+            color: #DC143C;
+        }
+
+        .order-status.in-progress {
+            color: #FFA500;
+        }
+
+        .header {
+            background: linear-gradient(to right, #6A5ACD, #00CED1);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .confirm-delivery-button {
+            background-color: #28a745; /* Màu xanh lá cây */
+        }
+
+        .confirm-delivery-button:hover {
+            background-color: #218838;
+        }
+
+        .payment-button {
+            background-color: #4CAF50 !important; /* Màu xanh lá */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-button:hover {
+            background-color: #45a049 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+        .btn-inactive {
+            opacity: 0.5; /* Độ trong suốt để làm cho nút nhạt màu */
+        }
+        .order-return-button.reorder {
+            background-color: #4CAF50;
+            margin-left: 10px;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .order-return-button.reorder:hover {
+            background-color: #45a049;
+        }
+        /* Thêm vào phần style */
+        .preview-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .preview-image-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .remove-image {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+<header>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/categories}">
+                <i class="bi bi-house-heart-fill" style="font-size: 2rem; color: #ffc107;"></i>
+                <span class="ms-2">My Furniture Store</span>
+            </a>
+            <!-- Navigation Items -->
+            <div class="d-flex ms-3 nav-items">
+                <div class="nav-item">
+                    <a th:if="${session.user0 != null}" href="" class="nav-link">
+                        <i class="bi bi-bell-fill"></i>
+                        <span class="nav-text">Thông báo</span>
+                        <span class="notification-dot"></span>
+                    </a>
+                    <!-- Dropdown thông báo -->
+                    <div class="notification-dropdown">
+                        <div class="notification-header">
+                            Thông Báo Mới Nhận
+                        </div>
+                        <div class="notification-content">
+                            <i class="bi bi-bell-slash notification-empty-icon"></i>
+                            <p class="notification-empty-text">Bạn chưa có thông báo nào</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hỗ trợ -->
+                <div class="nav-item">
+                    <a href="/contact" class="nav-link" target="_blank">  <!-- Thêm target="_blank" để mở tab mới -->
+                        <i class="bi bi-headset"></i>
+                        <span class="nav-text">Hỗ trợ</span>
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a href="/address/info" class="nav-link">
+                        <i class="bi bi-geo-alt"></i>
+                        <span class="nav-text">Địa chỉ</span>
+                    </a>
+                </div>
+
+                <div class="nav-item cart-wrapper">
+                    <a th:if="${session.user0 != null}" href="/cart/view" class="cart-button">
+                        <i class="bi bi-cart3"></i>
+                        <span class="nav-text">Giỏ hàng</span>
+                        <span id="cartItemCount" class="cart-badge"></span>
+                    </a>
+                    <a th:unless="${session.user0 != null}" href="/users/login" class="cart-button">
+                        <i class="bi bi-cart3"></i>
+                        <span class="nav-text">Giỏ hàng</span>
+                    </a>
+
+                    <!-- Dropdown menu cho giỏ hàng -->
+                    <div class="cart-dropdown">
+                        <div class="cart-items" id="cartItemsList">
+                            <!-- Các sản phẩm sẽ được thêm vào đây qua JavaScript -->
+                        </div>
+                        <div class="cart-footer">
+                            <a href="/cart/view" class="btn btn-primary w-100">Xem giỏ hàng</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <a th:if="${session.user0 != null}" href="/order/purchase" class="nav-link">
+                        <i class="bi bi-bag-check"></i>
+                        <span class="nav-text">Đơn mua</span>
+                    </a>
+                    <a th:unless="${session.user0 != null}" href="/users/login" class="nav-link">
+                        <i class="bi bi-bag-check"></i>
+                        <span class="nav-text">Đơn mua</span>
+                    </a>
+                </div>
+                <!-- Logout -->
+                <div class="nav-item">
+                    <a th:if="${session.user0 != null}" href="/users/logout" class="nav-link">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span class="nav-text">Đăng xuất</span>
+                    </a>
+                    <a th:unless="${session.user0 != null}" href="/users/login" class="nav-link">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        <span class="nav-text">Đăng nhập</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <section class="hero position-relative">
+        <div class="container">
+            <div class="position-absolute top-1 end-0 m-3" th:if="${session.userName != null}">
+                <a href="/profile" class="nav-link text-white">
+                    <i class="bi bi-person-fill"></i>
+                    <span class="nav-text">Xin chào, <span th:text="${session.userName}">Username</span></span>
+                </a>
+            </div>
+            <div class="intro-excerpt">
+                <h1>Welcome to My Store</h1>
+                <p>Discover the latest products and trends.</p>
+            </div>
+        </div>
+    </section>
+</header>
+<!-- Phần còn lại của mã HTML giữ nguyên, chỉ thay đổi vị trí nút trả hàng -->
+<div class="container mt-5">
+    <h1 class="text-center header mb-4">Quản lý Đơn hàng</h1>
+    <form th:action="@{/order/purchase}" method="get" id="paginationForm">
+        <input type="hidden" name="status" th:value="${status}"/>
+        <input type="hidden" name="page" th:value="0"/>
+
+        <!-- ComboBox để chọn size -->
+        <select name="size" onchange="document.getElementById('paginationForm').submit();">
+            <option value="5" th:selected="${size == 5}">5</option>
+            <option value="10" th:selected="${size == 10}">10</option>
+            <option value="15" th:selected="${size == 15}">15</option>
+            <option value="20" th:selected="${size == 20}">20</option>
+        </select>
+    </form>
+
+    <!-- Thanh điều hướng -->
+    <div class="nav-buttons d-flex justify-content-center mb-4">
+        <a href="#" onclick="handleNavButtonClick(this); return false;" th:href="@{/order/purchase?status=0}" class="btn">
+            <i class="fas fa-list"></i> Tất cả
+        </a>
+        <a href="#" onclick="handleNavButtonClick(this); return false" th:href="@{/order/purchase?status=1}" class="btn">
+            <i class="fas fa-list"></i> Mới
+        </a>
+        <a href="#" onclick="handleNavButtonClick(this); return false" th:href="@{/order/purchase?status=2}" class="btn">
+            <i class="fas fa-check-circle"></i> Đã xác nhận
+        </a>
+        <a href="#" onclick="handleNavButtonClick(this); return false" th:href="@{/order/purchase?status=3}" class="btn">
+            <i class="fas fa-truck-moving"></i> Đang giao
+        </a>
+        <a href="#" onclick="handleNavButtonClick(this); return false" th:href="@{/order/purchase?status=4}" class="btn">
+            <i class="fas fa-box"></i> Đã giao
+        </a>
+        <a href="#" onclick="handleNavButtonClick(this); return false" th:href="@{/order/purchase?status=5}" class="btn">
+            <i class="fas fa-ban"></i> Hủy
+        </a>
+        <a href="#" onclick="handleNavButtonClick(this); return false" th:href="@{/order/purchase?status=6}" class="btn">
+            <i class="fas fa-sync-alt"></i> Trả hàng/Hoàn tiền
+        </a>
+    </div>
+
+    <!-- Phần hiển thị danh sách đơn hàng -->
+    <div th:if="${orders != null}">
+        <div class="row">
+            <div class="col-md-12" th:each="order : ${orders}">
+                <div class="order-card">
+                    <div class="order-details">
+                        <div th:each="item : ${order.orderItems}" class="order-item">
+
+                            <img class="order-img"
+                                 th:src="${item.product.imageUrl}"
+                                 alt="Product Image"
+                                 style="width: 100px; height: 100px; object-fit: contain;"
+                                 onerror="this.src='https://via.placeholder.com/150';">
+                            <div class="order-details">
+                                <div class="order-header" th:text="${item.product.name}">Product Name</div>
+                                <div class="order-body" th:text="${item.product.description}">Product Description</div>
+                                <div class="order-quantity">
+                                    <span>x</span><span th:text="${item.quantity}">Product Quantity</span>
+                                </div>
+                            </div>
+                            <div class="order-item-total" th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')}+ ' VNĐ'">Item Total</div>
+                            <!-- Nút đánh giá cho từng item -->
+                            <div th:if="${order.status == 'Đã giao' or order.status == 'Đang duyệt' or order.status == 'Từ chối trả' && T(java.time.LocalDate).now().minusDays(7).isBefore(T(java.time.LocalDate).from(order.createdAt))}">
+                                <button th:if="${item.reviewed}" class="order-return-button"
+                                        th:data-product-id="${item.product.id}"
+                                        onclick="reviewButtonClicked(this)">
+                                    Sửa đánh giá
+                                </button>
+                                <button th:unless="${item.reviewed}" class="order-return-button"
+                                        th:data-product-id="${item.product.id}"
+                                        onclick="reviewButtonClicked(this)">
+                                    Thêm đánh giá
+                                </button>
+                            </div>
+                        </div>
+                        <div class="order-payment-method">
+                            <span>Phương thức thanh toán: </span>
+                            <span th:text="${order.paymentMethod}"></span>
+                        </div>
+                    </div>
+                    <div class="order-total">
+                        <div th:if="${order.status == 'Đang giao' or order.status == 'Đã nhận hàng' && T(java.time.LocalDate).now().minusDays(15).isBefore(T(java.time.LocalDate).from(order.createdAt))}">
+                            <button class="order-return-button confirm-delivery-button"
+                                    th:class="${order.status == 'Đã nhận hàng' ? 'order-return-button disabled' : 'order-return-button'}"
+                                    th:text="${order.status == 'Đã nhận hàng' ? 'Đã nhận hàng' : 'Xác nhận'}"
+                                    th:disabled="${order.status == 'Đã nhận hàng'}"
+                                    th:data-order-id="${order.id}"
+                                    onclick="xacNhanDaGiaoClicked(this)">
+                                Đã nhận hàng
+                            </button>
+                            <small class="text-muted d-block mt-2">
+                                Chỉ nhấn khi bạn đã nhận được đơn hàng
+                            </small>
+                        </div>
+                        <div th:if="${order.status == 'Chờ xác nhận'}">
+                            <button class="order-return-button cancel-button"
+                                    th:data-order-id="${order.id}"
+                                    onclick="huyDonHangClicked(this)">
+                                Hủy đơn
+                            </button>
+                            <!-- Nút thanh toán -->
+                            <div th:if="${order.paymentMethod == 'BANK' and order.imageUrl == null}">
+                                <button class="order-return-button payment-button"
+                                        th:data-order-id="${order.id}"
+                                        th:data-amount="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')}"
+                                        onclick="showPaymentQR(this)">
+                                    <i class="fas fa-qrcode me-2"></i>Thanh toán QR
+                                </button>
+                            </div>
+                        </div>
+                        <div th:if="${order.status == 'Đã giao' or order.status == 'Đang duyệt' && T(java.time.LocalDate).now().minusDays(7).isBefore(T(java.time.LocalDate).from(order.createdAt))}">
+                            <button class="order-return-button"
+                                    th:class="${order.status == 'Đang duyệt' ? 'order-return-button disabled' : 'order-return-button'}"
+                                    th:text="${order.status == 'Đang duyệt' ? 'Đang duyệt' : 'Trả hàng'}"
+                                    th:disabled="${order.status == 'Đang duyệt'}"
+                                    th:data-order-id="${order.id}"
+                                    th:data-created-at="${order.createdAt}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#returnModal">
+                                Trả hàng
+                            </button>
+                            <small class="text-muted d-block mt-2 return-status-message">
+                                Bạn có thể trả hàng trong vòng <span class="remaining-days"></span> ngày
+                            </small>
+                        </div>
+
+                        <span th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">Total Amount</span>
+                    </div>
+
+                    <div class="order-status"
+                         th:class="${order.status == 'Hủy' ? 'order-status cancelled' : (order.status == 'Đang giao' ? 'order-status in-progress' : 'order-status completed')}">
+                        <span th:text="${order.status}">Status</span>
+                    </div>
+                    <button th:if="${order.status == 'Hủy' or order.status == 'Trả hàng'}"
+                            class="order-return-button"
+                            onclick="reorderItems(this)"
+                            th:data-order-items="${#strings.arrayJoin(order.orderItems.![product.id + ',' + quantity], ';')}">
+                        <i class="fas fa-cart-plus"></i> Mua lại
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:if="${totalPages > 1}" class="pagination">
+        <ul class="pagination justify-content-center">
+            <!-- Nút "Trang trước" -->
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                <a class="page-link"
+                   th:href="@{/order/purchase(status=${status}, page=${currentPage - 1}, size=${size})}">Trang trước</a>
+            </li>
+
+            <!-- Các nút trang -->
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                <a class="page-link" th:href="@{/order/purchase(status=${status}, page=${i}, size=${size})}"
+                   th:text="${i + 1}">1</a>
+            </li>
+
+            <!-- Nút "Trang sau" -->
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                <a class="page-link"
+                   th:href="@{/order/purchase(status=${status}, page=${currentPage + 1}, size=${size})}">Trang sau</a>
+            </li>
+        </ul>
+    </div>
+
+
+    <div th:if="${orders == null or orders.isEmpty()}">
+        <p class="no-orders-message">Không có đơn hàng nào trong trạng thái này.</p>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="paymentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentModalLabel">Thanh toán qua QR Code</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <!-- Mã QR mặc định -->
+                    <img th:src="@{/css/qr.jpg}" alt="QR Code" class="img-fluid" id="qrImage"/>
+
+                    <!-- Ô để người dùng chọn ảnh -->
+                    <input type="file" id="fileInput" class="form-control mb-3" accept="image/*">
+                    <div id="imagePreview">
+                        <!-- Hình ảnh sẽ được hiển thị ở đây sau khi người dùng chọn -->
+                    </div>
+
+                    <p id="paymentAmount" class="mt-3">Bạn cần thanh toán số tiền là: <span id="amount"></span> VND</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="payButton">Thanh toán</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal trả hàng -->
+<div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="returnModalLabel">Trả Hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="returnForm">
+                    <div class="mb-3">
+                        <label for="returnReason" class="form-label">Lý do trả hàng</label>
+                        <textarea class="form-control" id="returnReason" rows="3" required></textarea>
+                    </div>
+                    <!-- Trong modal trả hàng, sau input file -->
+                    <div class="mb-3">
+                        <label for="returnImages" class="form-label">Ảnh minh chứng</label>
+                        <input type="file" class="form-control" id="returnImages" accept="image/*" multiple>
+                        <div id="imagePreviewContainer" class="mt-3 d-flex flex-wrap gap-2">
+                            <!-- Ảnh preview sẽ được thêm vào đây -->
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="submitReturn">Gửi yêu cầu trả hàng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    function showPaymentQR(button) {
+        const orderId = button.getAttribute('data-order-id');
+        const amount = button.getAttribute('data-amount');
+
+        // Cập nhật thông tin trong modal
+        document.getElementById('amount').innerText = amount;
+        document.getElementById('paymentModal').setAttribute('data-order-id', orderId);
+
+        // Reset form và preview
+        document.getElementById('fileInput').value = '';
+        document.getElementById('imagePreview').innerHTML = '';
+
+        // Hiển thị modal
+        const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+        paymentModal.show();
+
+        // Gắn sự kiện cho nút thanh toán
+        document.getElementById('payButton').onclick = handlePayment;
+    }
+
+    function handlePayment() {
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        const orderId = document.getElementById('paymentModal').getAttribute('data-order-id');
+
+        console.log('Handling payment...'); // Debug log
+        console.log('File:', file);
+        console.log('OrderId:', orderId);
+
+        if (!file) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Thông báo',
+                text: 'Vui lòng chọn ảnh thanh toán!'
+            });
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('paymentImage', file);
+        formData.append('orderId', orderId);
+
+        fetch('/order/save-payment', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Lỗi máy chủ');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/order/purchase?status=1';
+                } else {
+                    throw new Error(data.message || 'Không thể lưu ảnh thanh toán');
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi',
+                    text: error.message || 'Đã xảy ra lỗi khi lưu ảnh thanh toán. Vui lòng thử lại!'
+                });
+            });
+    }
+
+    // Thêm preview ảnh
+    document.getElementById('fileInput').addEventListener('change', function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'img-fluid mt-3';
+                document.getElementById('imagePreview').innerHTML = '';
+                document.getElementById('imagePreview').appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Gắn sự kiện cho nút thanh toán trong modal
+
+    function saveScrollPosition() {
+        localStorage.setItem('scrollPosition', window.scrollY);
+    }
+
+    function restoreScrollPosition() {
+        const scrollPosition = localStorage.getItem('scrollPosition');
+        if (scrollPosition) {
+            window.scrollTo(0, parseInt(scrollPosition));
+            localStorage.removeItem('scrollPosition');
+        }
+    }
+
+    // Đặt hàm ở ngoài sự kiện DOMContentLoaded
+    function returnButtonClicked(button) {
+        saveScrollPosition();
+        button.textContent = 'Đang chờ duyệt trả hàng';
+        button.classList.add('disabled');
+        button.disabled = true;
+
+        var orderId = button.getAttribute('data-order-id');
+
+        if (!orderId) {
+            console.error('Không tìm thấy orderId');
+            return;
+        }
+
+        console.log('orderId:', orderId);
+        fetch('/order/update-status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                orderId: orderId,
+                status: 'Đang duyệt'
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Trạng thái đơn hàng đã được cập nhật');
+                } else {
+                    console.error('Cập nhật trạng thái thất bại');
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi gửi yêu cầu:', error);
+            });
+    }
+
+    // Chỉ cần DOM đã được tải là có thể sử dụng hàm
+    document.addEventListener('DOMContentLoaded', function () {
+    });
+
+    // Hàm khi nhấn nút đánh giá
+    function reviewButtonClicked(button) {
+        // Lấy productId từ data attribute
+        var productId = button.getAttribute('data-product-id');
+
+        if (!productId) {
+            console.error('Không tìm thấy productId');
+            return;
+        }
+
+        saveScrollPosition();
+        window.location.href = '/order/review/' + productId;  // Thay đường dẫn theo yêu cầu của bạn
+    }
+
+    function huyDonHangClicked(button) {
+        saveScrollPosition();
+        var orderId = button.getAttribute('data-order-id');
+
+        if (!orderId) {
+            console.error('Không tìm thấy mã đơn hàng');
+            return;
+        }
+
+        // Hiển thị xác nhận trước khi hủy
+        if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?')) {
+            fetch('/order/update-status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    orderId: orderId,
+                    status: 'Hủy'
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Ẩn hoặc loại bỏ đơn hàng khỏi giao diện
+                        button.closest('.order-card').remove();
+                        alert('Đã hủy đơn hàng thành công');
+                    } else {
+                        alert('Hủy đơn hàng không thành công');
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi gửi yêu cầu:', error);
+                    alert('Có lỗi xảy ra khi hủy đơn hàng');
+                });
+        }
+    }
+
+    function xacNhanDaGiaoClicked(button) {
+        saveScrollPosition();
+        button.textContent = 'Đã nhận hàng';
+        button.classList.add('disabled');
+        button.disabled = true;
+
+        var orderId = button.getAttribute('data-order-id');
+
+        if (!orderId) {
+            console.error('Không tìm thấy mã đơn hàng');
+            return;
+        }
+
+        // Hiển thị xác nhận trước khi cập nhật trạng thái
+        if (confirm('Bạn đã nhận được đơn hàng và muốn xác nhận?')) {
+            fetch('/order/update-status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    orderId: orderId,
+                    status: 'Đã nhận hàng'
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Ẩn hoặc loại bỏ đơn hàng khỏi giao diện hoặc cập nhật trạng thái
+                        button.closest('.order-card').remove();
+                        window.location.reload();
+                        alert('Đã xác nhận giao hàng thành công');
+                    } else {
+                        alert('Xác nhận giao hàng không thành công');
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi gửi yêu cầu:', error);
+                    alert('Có lỗi xảy ra khi xác nhận giao hàng');
+                });
+        }
+    }
+    function formatCurrency(amount) {
+        // Làm tròn đến 2 chữ số thập phân và định dạng theo tiếng Việt
+        return new Intl.NumberFormat('vi-VN', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(amount);
+    }
+    // Lắng nghe sự kiện khi modal trả hàng được mở
+    document.getElementById('returnModal').addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const orderId = button.getAttribute('data-order-id');
+        this.setAttribute('data-order-id', orderId);
+    });
+
+    // Xử lý sự kiện khi người dùng nhấn nút gửi yêu cầu trả hàng
+    document.getElementById('submitReturn').addEventListener('click', function () {
+        const returnModal = document.getElementById('returnModal');
+        const orderId = returnModal.getAttribute('data-order-id');
+        const returnReason = document.getElementById('returnReason').value;
+        const returnImages = document.getElementById('returnImages').files;
+
+        if (returnReason.trim() === '') {
+            alert('Vui lòng nhập lý do trả hàng');
+            return;
+        }
+
+        // Tạo FormData để gửi dữ liệu và ảnh minh chứng
+        const formData = new FormData();
+        formData.append('orderId', orderId);
+        formData.append('returnReason', returnReason);
+        for (let i = 0; i < returnImages.length; i++) {
+            formData.append('returnImages', returnImages[i]);
+        }
+
+        // Gửi yêu cầu trả hàng đến server
+        fetch('/order/return-request', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+
+                if (data.status === 'success') {
+                    alert('Yêu cầu trả hàng đã được gửi thành công');
+                    window.location.reload();
+                    document.getElementById('returnForm').reset();
+                    bootstrap.Modal.getInstance(returnModal).hide();
+                } else {
+                    alert(data.message || 'Có lỗi xảy ra khi gửi yêu cầu trả hàng');
+                }
+            })
+            .catch(error => {
+                alert('Có lỗi xảy ra khi gửi yêu cầu trả hàng');
+            });
+    });
+    function handleNavButtonClick(button) {
+        // Lấy tất cả các nút trong thanh điều hướng
+        var navButtons = document.querySelectorAll('.nav-buttons .btn');
+
+        // Xóa lớp 'btn-inactive' khỏi tất cả các nút
+        navButtons.forEach(function(btn) {
+            btn.classList.remove('btn-inactive');
+        });
+
+        // Thêm lớp 'btn-inactive' vào tất cả các nút khác ngoại trừ nút được nhấn
+        navButtons.forEach(function(btn) {
+            if (btn !== button) {
+                btn.classList.add('btn-inactive');
+            }
+        });
+
+        // Lưu vị trí cuộn và chuyển hướng
+        saveScrollPosition();
+        window.location.href = button.href;
+    }
+    function setActiveNavButton() {
+        // Lấy tất cả các nút trong thanh điều hướng
+        var navButtons = document.querySelectorAll('.nav-buttons .btn');
+
+        // Lấy URL hiện tại
+        var currentUrl = window.location.href;
+
+        // Duyệt qua các nút và kiểm tra URL tương ứng
+        navButtons.forEach(function(btn) {
+            if (currentUrl.includes(btn.getAttribute('href'))) {
+                // Xóa lớp 'btn-inactive' khỏi nút hiện tại
+                btn.classList.remove('btn-inactive');
+            } else {
+                // Thêm lớp 'btn-inactive' vào các nút khác
+                btn.classList.add('btn-inactive');
+            }
+        });
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Cập nhật số ngày còn lại cho tất cả các đơn hàng
+        document.querySelectorAll('.order-return-button').forEach(button => {
+            if (!button.disabled) {
+                const createdAt = button.getAttribute('data-created-at');
+                if (createdAt) {
+                    const orderDate = new Date(createdAt);
+                    const currentDate = new Date();
+                    const returnLimit = new Date(orderDate);
+                    returnLimit.setDate(returnLimit.getDate() + 7);
+
+                    const remainingDays = Math.ceil((returnLimit - currentDate) / (1000 * 60 * 60 * 24));
+
+                    // Tìm các elements cần cập nhật
+                    const statusMessageElement = button.parentElement.querySelector('.return-status-message');
+                    const remainingDaysElement = button.parentElement.querySelector('.remaining-days');
+
+                    if (remainingDays <= 0) {
+                        // Đã hết hạn trả hàng
+                        button.disabled = true;
+                        button.classList.add('disabled');
+                        button.style.display = 'none'; // Ẩn nút trả hàng
+                        if (statusMessageElement) {
+                            statusMessageElement.classList.remove('text-muted');
+                            statusMessageElement.classList.add('text-danger');
+                            statusMessageElement.textContent = 'Đã quá thời hạn trả hàng';
+                        }
+                    } else {
+                        // Còn thời hạn trả hàng
+                        if (remainingDaysElement) {
+                            remainingDaysElement.textContent = remainingDays;
+                        }
+                    }
+                }
+            }
+        });
+    });
+    function reorderItems(button) {
+        // Lấy thông tin sản phẩm từ data attribute
+        const orderItemsStr = button.getAttribute('data-order-items');
+        const orderItems = orderItemsStr.split(';');
+
+        // Biến đếm số sản phẩm đã thêm thành công
+        let successCount = 0;
+
+        // Promise array để xử lý tất cả các request
+        const promises = orderItems.map(item => {
+            const [productId, quantity] = item.split(',');
+
+            return fetch('/cart/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `productId=${productId}&quantity=1`
+            })
+                .then(response => {
+                    if (response.ok) {
+                        successCount++;
+                        return response.text();
+                    }
+                    throw new Error('Network response was not ok.');
+                });
+        });
+
+        // Xử lý tất cả các promise
+        Promise.all(promises)
+            .then(() => {
+                // Chuyển hướng đến trang giỏ hàng
+                window.location.href = '/cart/view';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng');
+            });
+    }
+    // Thêm vào phần script
+    document.getElementById('returnImages').addEventListener('change', function(e) {
+        const previewContainer = document.getElementById('imagePreviewContainer');
+        previewContainer.innerHTML = ''; // Xóa các preview cũ
+
+        // Xử lý mỗi file được chọn
+        Array.from(this.files).forEach((file, index) => {
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                const previewWrapper = document.createElement('div');
+                previewWrapper.className = 'preview-image-container';
+
+                const img = document.createElement('img');
+                img.src = event.target.result;
+                img.className = 'preview-image';
+
+                const removeButton = document.createElement('span');
+                removeButton.className = 'remove-image';
+                removeButton.innerHTML = '×';
+                removeButton.onclick = function() {
+                    // Tạo một input file mới để reset selection
+                    const newInput = document.createElement('input');
+                    newInput.type = 'file';
+                    newInput.multiple = true;
+                    newInput.accept = 'image/*';
+                    newInput.className = 'form-control';
+                    newInput.id = 'returnImages';
+
+                    // Tạo FileList mới không bao gồm ảnh bị xóa
+                    const dt = new DataTransfer();
+                    const files = document.getElementById('returnImages').files;
+                    for(let i = 0; i < files.length; i++) {
+                        if(i !== index) dt.items.add(files[i]);
+                    }
+                    newInput.files = dt.files;
+
+                    // Thay thế input cũ
+                    const oldInput = document.getElementById('returnImages');
+                    oldInput.parentNode.replaceChild(newInput, oldInput);
+
+                    // Thêm lại event listener
+                    newInput.addEventListener('change', arguments.callee);
+
+                    // Xóa preview
+                    previewWrapper.remove();
+                };
+
+                previewWrapper.appendChild(img);
+                previewWrapper.appendChild(removeButton);
+                previewContainer.appendChild(previewWrapper);
+            };
+
+            reader.readAsDataURL(file);
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        setActiveNavButton();
+        restoreScrollPosition();
+    });
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/script.js}"></script>
+
+</body>
+</html>

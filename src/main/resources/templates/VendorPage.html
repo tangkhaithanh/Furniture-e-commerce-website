@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Trang quản lý dành cho người bán" />
+  <meta name="keywords" content="admin, dashboard, seller" />
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+  <title>Trang quản lý dành cho người bán</title>
+
+  <style>
+    .custom-navbar {
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+
+    .custom-navbar .navbar-brand {
+      font-size: 32px;
+      font-weight: 600;
+    }
+
+    .custom-navbar .navbar-brand span {
+      color: #3b5d50;
+    }
+
+    .custom-navbar-nav .nav-link {
+      font-weight: 500;
+      color: #ffffff !important;
+      opacity: 0.5;
+      transition: .3s all ease;
+    }
+
+    .custom-navbar-nav .nav-link:hover,
+    .custom-navbar-nav .nav-link.active {
+      opacity: 1;
+    }
+
+    .custom-navbar .navbar-toggler {
+      border: none;
+      color: #ffffff !important;
+    }
+
+    .custom-navbar .navbar-brand {
+      color: #ffffff !important;
+      text-decoration: none;
+    }
+
+    .dashboard-content {
+      padding: 2rem;
+    }
+
+    .stats-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+
+    .stats-card h3 {
+      color: #3b5d50;
+      margin-bottom: 0.5rem;
+    }
+
+    .welcome-section {
+      background: #3b5d50;
+      color: white;
+      padding: 2rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+
+<body>
+<!-- Start Header/Navigation -->
+<nav class="custom-navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Seller navigation bar">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">Vendor Management<span></span></a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsSeller" aria-controls="navbarsSeller" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsSeller">
+      <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+        <li class="nav-item">
+          <a class="nav-link" href="/vendor/manage_products"><i class="fas fa-box me-2"></i>Quản lý sản phẩm</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/vendor/orders"><i class="fas fa-shopping-cart me-2"></i>Quản lý đơn hàng</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#generateCouponModal"><i class="fas fa-percent me-2"></i>Khuyến mãi</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/vendor/revenue/overview"><i class="fas fa-chart-line me-2"></i>Quản lý doanh thu</a>
+        </li>
+      </ul>
+
+      <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+        <li class="nav-item">
+          <a class="nav-link" href="/users/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+        </li>
+      </ul>	
+    </div>
+  </div>
+</nav>
+<!-- End Header/Navigation -->
+
+<!-- Start Dashboard Content -->
+<div class="dashboard-content">
+  <div class="container">
+    <div class="welcome-section">
+      <h2>Xin chào, Vendor!</h2>
+      <p>Chào mừng bạn đến với trang quản lý</p>
+    </div>
+</div>
+</div>
+<!-- Modal Tạo Mã Giảm Giá -->
+<div class="modal fade" id="generateCouponModal" tabindex="-1" aria-labelledby="generateCouponModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="generateCouponModalLabel">Tạo Mã Giảm Giá</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="couponForm">
+          <!-- Mã giảm giá -->
+          <div class="mb-3">
+            <label for="couponCode" class="form-label">Mã Giảm Giá</label>
+            <input type="text" class="form-control" id="couponCode" required>
+          </div>
+          <!-- Giá trị giảm -->
+          <div class="mb-3">
+            <label for="discountAmount" class="form-label">Giá Trị Giảm</label>
+            <input type="number" class="form-control" id="discountAmount" required>
+          </div>
+          <!-- Ngày hết hạn -->
+          <div class="mb-3">
+            <label for="expiryDate" class="form-label">Ngày Hết Hạn</label>
+            <input type="date" class="form-control" id="expiryDate" required>
+          </div>
+          <!-- Số lượng -->
+          <div class="mb-3">
+            <label for="quantity" class="form-label">Số Lượng</label>
+            <input type="number" class="form-control" id="quantity" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" onclick="generateCoupon()">Tạo Mã</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Dashboard Content -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script>
+  function generateCoupon() {
+    const couponCode = document.getElementById('couponCode').value;
+    const discountAmount = document.getElementById('discountAmount').value;
+    const date = document.getElementById('expiryDate').value;
+    const quantity = document.getElementById('quantity').value;
+
+    // Kiểm tra dữ liệu đầu vào
+    if (!couponCode || !discountAmount || !date || !quantity) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Thông báo',
+        text: 'Vui lòng điền đầy đủ thông tin mã giảm giá!'
+      });
+      return;
+    }
+
+    const data = {
+      code: couponCode,
+      discountAmount: discountAmount,
+      expiryDate: date + " 23:59:59",
+      quantity: quantity
+    };
+
+    // Gửi yêu cầu tạo mã giảm giá
+    fetch('/vendor/generate-coupon', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+            .then(response => response.json())
+            .then(responseData => {
+              // Đóng modal
+              const modal = bootstrap.Modal.getInstance(document.getElementById('generateCouponModal'));
+              modal.hide();
+
+              // Reset form
+              document.getElementById('couponForm').reset();
+
+              if (responseData.success) {
+                // Hiển thị thông báo thành công
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Thành công',
+                  text: responseData.message || 'Mã giảm giá đã được tạo thành công!'
+                }).then(() => {
+                  window.location.reload();
+                });
+              } else {
+                throw new Error(responseData.message || 'Không thể tạo mã giảm giá');
+              }
+            })
+            .catch(error => {
+              console.error('Lỗi:', error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: error.message || 'Đã xảy ra lỗi khi tạo mã giảm giá. Vui lòng thử lại sau!'
+              });
+            });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register</title>
+    <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+    />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Poppins", sans-serif;
+            background-color: #1a1a2e;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .register-container {
+            background-color: #242437;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 400px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .logo {
+            display: block;
+            margin: 0 auto 30px;
+            max-width: 150px;
+            animation: logoAnimation 1s ease-in-out infinite alternate;
+        }
+        @keyframes logoAnimation {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #ffffff;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ffffff;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #32324b;
+            font-size: 16px;
+            color: #ffffff;
+            transition: background-color 0.3s ease;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            background-color: #4a4a6a;
+        }
+        .btn-register {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #0077b6;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .btn-register:hover {
+            background-color: #023e8a;
+            transform: translateY(-2px);
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #ffffff;
+        }
+        .login-link a {
+            color: #0077b6;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .login-link a:hover {
+            color: #023e8a;
+        }
+        .otp-form {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #32324b;
+            border-radius: 5px;
+        }
+        .otp-form p {
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="register-container">
+    <img
+            src="https://i.etsystatic.com/25493577/r/il/fcea59/3570208232/il_fullxfull.3570208232_1wn2.jpg"
+            alt="Logo"
+            class="logo"
+    />
+    <h2>Register</h2>
+
+    <!-- Registration Form -->
+    <form id="registerForm">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required />
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required />
+        </div>
+        <div class="form-group">
+            <label for="retype_password">Retype Password</label>
+            <input
+                    type="password"
+                    id="retype_password"
+                    name="retypePassword"
+                    required
+            />
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required />
+        </div>
+
+        <button type="submit" class="btn-register">Register</button>
+    </form>
+
+    <!-- OTP Form -->
+    <div class="otp-form" id="otpForm">
+        <p>
+            OTP has been sent to your email. Please enter the OTP to confirm your
+            registration:
+        </p>
+        <div class="form-group">
+            <label for="otp">OTP</label>
+            <input type="text" id="otp" name="otp" required />
+        </div>
+        <button type="button" id="verifyOTPBtn" class="btn-register">
+            Verify OTP
+        </button>
+    </div>
+
+    <div class="login-link">
+        Already have an account? <a href="/users/login">Login</a>
+    </div>
+</div>
+
+<script>
+    // Xử lý form đăng ký
+    document
+        .getElementById("registerForm")
+        .addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const formData = {
+                username: document.getElementById("username").value,
+                password: document.getElementById("password").value,
+                retypePassword: document.getElementById("retype_password").value,
+                email: document.getElementById("email").value,
+            };
+
+            fetch("/users/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.message) {
+                        alert(
+                            "Registration successful! Please check your email for OTP."
+                        );
+                        // Hiển thị form nhập OTP
+                        document.getElementById("otpForm").style.display = "block";
+                        // Cập nhật email cho việc xác thực OTP
+                        localStorage.setItem("email", formData.email); // Lưu email vào localStorage
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    alert("Registration failed.");
+                });
+        });
+
+    // Xử lý xác thực OTP
+    document
+        .getElementById("verifyOTPBtn")
+        .addEventListener("click", function () {
+            const otp = document.getElementById("otp").value;
+            const email = localStorage.getItem("email"); // Lấy email từ localStorage
+
+            if (!otp) {
+                alert("Please enter the OTP.");
+                return;
+            }
+
+            const otpData = {
+                OTP: otp,
+            };
+
+            fetch("/users/verify-otp", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(otpData),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.message) {
+                        alert("OTP verified successfully. Registration complete!");
+                        window.location.href = "/users/login"; // Chuyển hướng đến trang đăng nhập
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    alert("OTP verification failed.");
+                });
+        });
+</script>
+</body>
+</html>

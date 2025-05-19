@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Đơn Hàng</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .dashboard-card {
+            transition: transform 0.3s ease-in-out;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background-color: #4e73df;
+            color: white;
+            font-weight: bold;
+            padding: 1rem;
+            border-bottom: none;
+        }
+        
+        .page-title {
+            color: #4e73df;
+            margin-bottom: 2rem;
+            font-weight: bold;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e3e6f0;
+        }
+
+        .table th {
+            background-color: #4e73df;
+            color: white;
+        }
+
+        .status-badge {
+           padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            border: 1px solid;
+        }
+
+        .status-pending {
+           	color: #f6c23e;
+            border-color: #f6c23e;
+        }
+
+        .status-processing {
+            color: #4e73df;
+            border-color: #4e73df;
+        }
+
+        .status-completed {
+            color: #1cc88a;
+            border-color: #1cc88a;
+        }
+
+        .status-cancelled {
+            color: #e74a3b;
+            border-color: #e74a3b;
+        }
+
+        .search-box {
+            border-radius: 15px;
+            border: 2px solid #e3e6f0;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Tạo khoảng cách giữa các phần tử tìm kiếm và lọc */
+        .input-group .btn {
+            margin-left: 10px; /* Khoảng cách giữa nút và ô nhập liệu */
+        }
+
+        /* Tạo khoảng cách giữa các cột tìm kiếm và lọc */
+        .search-box .col-md-5, .search-box .col-md-4 {
+            margin-right: 10px; /* Khoảng cách giữa các cột */
+        }
+    </style>
+</head>
+<body>
+    <!-- Include navigation -->
+    <div th:replace="~{manageRevenue.html}"></div>
+
+    <div class="container mt-5">
+        <h1 class="page-title">
+            <i class="fas fa-shopping-cart me-2"></i>Quản Lý Đơn Hàng
+        </h1>
+
+        <form th:action="@{/vendor/revenue/receipt}" method="get" class="row g-3">
+		    <div class="col-md-5">
+		        <div class="input-group">
+		            <input type="text" class="form-control" name="search" 
+		                   th:value="${search}" placeholder="Tìm kiếm theo ID, tên khách hàng...">
+		            <button type="submit" class="btn btn-primary">
+		                <i class="fas fa-search"></i> Tìm kiếm
+		            </button>
+		        </div>
+		    </div>
+		    <div class="col-md-4">
+		        <div class="input-group">
+		            <select class="form-select" name="status" id="status">
+		                <option value="" th:selected="${status == ''}">Tất cả trạng thái</option>
+		                <option value="Chờ xác nhận" th:selected="${status == 'Chờ xác nhận'}">Chờ xác nhận</option>
+		                <option value="Đã xác nhận" th:selected="${status == 'Đã xác nhận'}">Đã xác nhận</option>
+		                <option value="Chờ duyệt đi giao" th:selected="${status == 'Chờ duyệt đi giao'}">Chờ duyệt đi giao</option>
+		                <option value="Đang giao" th:selected="${status == 'Đang giao'}">Đang giao</option>
+		                <option value="Đã hoàn thành" th:selected="${status == 'Đã hoàn thành'}">Hoàn thành</option>
+		            </select>
+		            <button type="submit" class="btn btn-secondary">
+		                <i class="fas fa-filter"></i> Lọc
+		            </button>
+		        </div>
+		    </div>
+		    <!-- Thêm nút reset -->
+		    <div class="col-md-3">
+		        <a th:href="@{/vendor/revenue/receipt}" class="btn btn-outline-secondary">
+		            <i class="fas fa-redo"></i> Đặt lại
+		        </a>
+		    </div>
+		</form>
+
+        <!-- Orders Table -->
+        <div class="dashboard-card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Khách hàng</th>
+                                <th>Tổng tiền</th>
+                                <th>Giảm giá</th>
+                                <th>Thanh toán</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày tạo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="order : ${orders.content}">
+                                <td th:text="${order.id}"></td>
+                                <td>
+                                    <div th:text="${order.user.username}"></div>
+                                  
+                                </td>
+                                <td th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                                <td>
+                                    <div th:if="${order.coupon != null}">
+                                        <div th:text="${order.coupon.code}"></div>
+                                        <small class="text-muted" 
+                                               th:text="'-' + ${#numbers.formatDecimal(order.coupon.discountAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                                        </small>
+                                    </div>
+                                </td>
+                                <td><i class="fas fa-money-bill me-2"></i><span th:text="${order.paymentMethod}"></span></td>
+                                <td>
+                                    <span th:class="${'status-badge ' + 
+                                         (order.status == 'Chờ xác nhận' ? 'status-pending' : 
+                                          order.status == 'Đã xác nhận' ? 'status-confirmed' :
+                                          order.status == 'Chờ duyệt đi giao' ? 'status-waiting' :
+                                          order.status == 'Đang giao' ? 'status-delivering' :
+                                          'status-completed')}"
+                                          th:text="${order.status}">
+                                    </span>
+                                </td>
+                                <td th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <nav th:if="${orders.totalPages > 1}" aria-label="Page navigation" class="mt-4">
+				    <ul class="pagination justify-content-center">
+				        <li class="page-item" th:classappend="${orders.first ? 'disabled' : ''}">
+				            <a class="page-link" 
+							   th:href="@{/vendor/revenue/receipt(page=${orders.number - 1}, search=${search}, status=${status})}">
+							    <i class="fas fa-chevron-left"></i>
+							</a>
+				        </li>
+				        
+				        <li class="page-item" 
+				            th:each="i : ${#numbers.sequence(0, orders.totalPages - 1)}"
+				            th:classappend="${i == orders.number ? 'active' : ''}">
+				            <a class="page-link" 
+							   th:href="@{/vendor/revenue/receipt(page=${i}, search=${search}, status=${status})}"
+							   th:text="${i + 1}">1
+							</a>
+				        </li>
+				        
+				        <li class="page-item" th:classappend="${orders.last ? 'disabled' : ''}">
+				            <a class="page-link" 
+							   th:href="@{/vendor/revenue/receipt(page=${orders.number + 1}, search=${search}, status=${status})}">
+							    <i class="fas fa-chevron-right"></i>
+							</a>
+				        </li>
+				    </ul>
+				</nav>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

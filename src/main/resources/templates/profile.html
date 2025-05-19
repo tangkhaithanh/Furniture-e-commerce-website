@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Trang Cá Nhân</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f6f8f9 0%, #e5ebee 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .profile-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 50px;
+        }
+        .profile-header {
+            background: linear-gradient(to right, #6A5ACD, #00CED1);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .avatar-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="profile-container">
+        <div class="profile-header">
+            <h2 class="text-center">Trang Cá Nhân</h2>
+        </div>
+        
+        <form th:action="@{/profile/update}" method="post" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <div class="mb-3">
+                        <label for="avatarUpload" class="form-label">Ảnh Đại Diện</label>
+                        <input type="file" id="avatarUpload" name="avatarFile" class="form-control" accept="image/*">
+                        <img id="avatarPreview" 
+                             th:src="${user.avatarUrl != null ? user.avatarUrl : 'https://via.placeholder.com/200'}" 
+                             class="img-fluid avatar-preview mt-3">
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title text-center mb-4">Chỉnh Sửa Thông Tin</h5>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Tên Đăng Nhập</label>
+                                <input type="text" class="form-control" th:value="${user.username}" readonly>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email" class="form-control" th:value="${user.email}">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Số Điện Thoại</label>
+                                <input type="tel" name="phoneNumber" class="form-control" 
+                                       th:value="${user.phoneNumber}">
+                            </div>
+                            
+                            <div class="mb-3">
+    <label class="form-label">Giới Tính</label>
+    <select name="gender" class="form-select">
+        <option value="">Chọn giới tính</option>
+        <option value="MALE" th:selected="${user.gender != null && user.gender.toString() == 'MALE'}">Nam</option>
+        <option value="FEMALE" th:selected="${user.gender != null && user.gender.toString() == 'FEMALE'}">Nữ</option>
+        <option value="OTHER" th:selected="${user.gender != null && user.gender.toString() == 'OTHER'}">Khác</option>
+    </select>
+</div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Ngày Sinh</label>
+                                <input type="date" name="dateOfBirth" class="form-control" 
+                                       th:value="${user.dateOfBirth}">
+                            </div>
+                            
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">Cập Nhật Thông Tin</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Preview avatar before upload
+    document.getElementById('avatarUpload').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            document.getElementById('avatarPreview').src = e.target.result;
+        }
+        
+        reader.readAsDataURL(file);
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

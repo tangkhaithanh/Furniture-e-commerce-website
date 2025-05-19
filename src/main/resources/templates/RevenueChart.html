@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Quản lý Doanh Thu</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <!-- Flatpickr -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css" rel="stylesheet">
+    
+    <!-- Add Chart.js BEFORE your custom scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        .custom-navbar {
+            padding: 1rem 0;
+            background-color: #343a40;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+
+        .stat-card h3 {
+            color: #6c757d;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .date-picker-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: 400px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .error-message {
+            display: none;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+	<div th:replace="~{manageRevenue.html}"></div>
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="loading-overlay">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Error Message -->
+    <div id="errorMessage" class="error-message"></div>
+
+    <!-- Main Content -->
+    <div class="container py-4">
+        <h2 class="mb-4">Thống Kê Doanh Thu</h2>
+
+        <!-- Date Picker Section -->
+        <div class="date-picker-container">
+            <div class="row align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label">Từ ngày:</label>
+                    <input type="text" id="startDate" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Đến ngày:</label>
+                    <input type="text" id="endDate" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <button id="applyDate" class="btn btn-primary">
+                        <i class="fas fa-sync-alt me-2"></i>Cập nhật
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <h3>Tổng Doanh Thu</h3>
+                    <div class="value" id="totalRevenue">0₫</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <h3>Số Đơn Hàng</h3>
+                    <div class="value" id="totalOrders">0</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <h3>Trung Bình/Đơn</h3>
+                    <div class="value" id="avgOrderValue">0₫</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="chart-container">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/l10n/vn.js"></script>
+
+    <script>
+        // Format currency in VND
+        // Format currency in VND
+        function formatVND(amount) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND',
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+        
+        let revenueChart;
+
+        function initChart() {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            revenueChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Doanh Thu',
+                        data: [],
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Doanh Thu: ' + formatVND(context.raw);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return formatVND(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function updateRevenueData() {
+            document.getElementById('loadingIndicator').style.display = 'flex';
+            document.getElementById('errorMessage').style.display = 'none';
+
+            try {
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+
+                const response = await fetch(`/vendor/revenue/api/chart-data?startDate=${startDate}&endDate=${endDate}`);
+                if (!response.ok) {
+                    throw new Error('Lỗi khi tải dữ liệu');
+                }
+
+                const data = await response.json();
+
+                // Update chart
+                revenueChart.data.labels = data.dates.map(date => {
+                    const [year, month, day] = date.split('-');
+                    return `${day}/${month}`;
+                });
+                revenueChart.data.datasets[0].data = data.revenues;
+                revenueChart.update();
+
+                // Update stats
+                document.getElementById('totalRevenue').textContent = formatVND(data.totalRevenue);
+                document.getElementById('totalOrders').textContent = data.totalOrders.toLocaleString('vi-VN');
+                document.getElementById('avgOrderValue').textContent = formatVND(data.avgOrderValue);
+
+            } catch (error) {
+                console.error('Error:', error);
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = error.message || 'Có lỗi xảy ra khi tải dữ liệu';
+                errorMessage.style.display = 'block';
+            } finally {
+                document.getElementById('loadingIndicator').style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize date pickers
+            const today = new Date();
+            const thirtyDaysAgo = new Date(today);
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+
+            flatpickr("#startDate", {
+                dateFormat: "Y-m-d",
+                defaultDate: thirtyDaysAgo,
+                locale: "vn",
+                maxDate: "today"
+            });
+
+            flatpickr("#endDate", {
+                dateFormat: "Y-m-d",
+                defaultDate: today,
+                locale: "vn",
+                maxDate: "today"
+            });
+
+            initChart();
+            updateRevenueData();
+            // Add event listener for date update button
+            document.getElementById('applyDate').addEventListener('click', updateRevenueData);
+        });
+    </script>
+</body>
+</html>

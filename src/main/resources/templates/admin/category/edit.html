@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/fragments/head :: head">
+    <title>Chỉnh sửa danh mục</title>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+    <!-- Site wrapper -->
+    <div class="wrapper">
+        <div th:replace="admin/fragments/header :: header"></div>
+        <div th:replace="admin/fragments/sidebar :: sidebar"></div>
+
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Content Header -->
+            <section class="content-header">
+                <h1>Chỉnh sửa danh mục</h1>
+                <ol class="breadcrumb">
+                    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+                    <li><a href="#">Danh mục</a></li>
+                    <li class="active">Chỉnh sửa</li>
+                </ol>
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="col-md-13">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Cập nhật thông tin danh mục</h3>
+                        </div>
+                        <form id="editCategoryForm" role="form" method="post" 
+                              th:action="@{/admin/edit-category/{id}(id=${category.id})}"
+                              th:object="${category}" enctype="multipart/form-data">
+                            <!-- ID ẩn -->
+                            <input type="hidden" th:field="*{id}" />
+
+                            <div class="box-body">
+                                <!-- Tên danh mục -->
+                                <div class="form-group">
+                                    <label for="name">Tên danh mục</label>
+                                    <input type="text" class="form-control" id="name" th:field="*{name}"
+                                           placeholder="Nhập tên danh mục" required>
+                                </div>
+
+                                <!-- Hình ảnh hiện tại -->
+                                <div class="form-group">
+                                    <label for="currentImage">Hình ảnh hiện tại</label>
+                                    <div>
+                                        <img th:if="${category.images != null}" th:src="@{${category.images}}"
+                                             alt="Category Image" width="150px">
+                                        <span th:if="${category.images == null}">No Image</span>
+                                    </div>
+
+                                </div>
+
+                                <!-- Chọn hình ảnh mới -->
+                                <div class="form-group">
+                                    <label for="newImage">Chọn hình ảnh mới</label>
+                                    <input type="file" id="newImage" name="image" onchange="previewImage(this)"
+                                           class="form-control">
+                                    <div class="mt-3">
+                                        <img id="preview" src="" alt="Preview Image" style="max-width: 150px; display: none;">
+                                    </div>
+                                </div>
+
+                                <!-- Trạng thái danh mục -->
+                                <div class="form-group">
+                                    <label>Trạng thái danh mục</label>
+                                    <div>
+                                        <label class="radio-inline">
+                                            <input type="radio" th:field="*{status}" value="true"
+                                                   th:checked="${category.status == true}">
+                                            Còn kinh doanh
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" th:field="*{status}" value="false"
+                                                   th:checked="${category.status == false}">
+                                            Hết kinh doanh
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Mô tả danh mục -->
+                                <div class="form-group">
+                                    <label for="description">Mô tả danh mục</label>
+                                    <textarea id="description" class="form-control" th:field="*{description}" rows="3"
+                                              placeholder="Nhập mô tả danh mục"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Nút cập nhật -->
+                            <div class="box-footer">
+                                <button type="submit" class="btn btn-primary">Cập nhật</button>
+                                <a href="/admin/admin_categories" class="btn btn-secondary">Hủy</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div th:replace="admin/fragments/footer :: footer"></div>
+    </div>
+
+    <!-- Scripts -->
+    <div th:replace="admin/fragments/script :: script"></div>
+
+    <script>
+        function previewImage(input) {
+            const preview = document.getElementById('preview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+     // Hàm gửi yêu cầu thêm danh mục
+        
+    </script>
+</body>
+</html>

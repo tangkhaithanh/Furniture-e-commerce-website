@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/fragments/head :: head">
+    <title>Thêm danh mục</title>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+    <div th:replace="admin/fragments/header :: header"></div>
+
+    <!-- Left side column. contains the sidebar -->
+    <div th:replace="admin/fragments/sidebar :: sidebar"></div>
+
+    <div class="content-wrapper">
+        <section class="content">
+            <div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Thêm danh mục</h3>
+                    </div>
+                    <form id="addCategoryForm" enctype="multipart/form-data">
+                        <div class="box-body">
+                            <!-- Tên danh mục -->
+                            <div class="form-group">
+                                <label for="name">Tên danh mục</label>
+                                <input type="text" class="form-control" id="name" name="name"
+                                       placeholder="Nhập tên danh mục" required>
+                            </div>
+
+                            <!-- Ảnh danh mục -->
+                            <div class="form-group">
+                                <label for="fileInput">Ảnh</label>
+                                <input type="file" id="fileInput" name="images" onchange="chooseFile(this)"
+                                       class="form-control">
+
+                            </div>
+
+                            <!-- Trạng thái danh mục -->
+                            <div class="form-group">
+                                <label>Trạng thái danh mục</label>
+                                <div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" id="statusActive" name="status" class="form-check-input"
+                                               value="true" checked>
+                                        <label class="form-check-label" for="statusActive">Còn kinh doanh</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" id="statusInactive" name="status" class="form-check-input"
+                                               value="false">
+                                        <label class="form-check-label" for="statusInactive">Hết kinh doanh</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mô tả danh mục -->
+                            <div class="form-group">
+                                <label for="description">Mô tả danh mục</label>
+                                <textarea id="description" name="description" class="form-control"
+                                          placeholder="Nhập mô tả danh mục" rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="box-footer">
+                            <button type="button" class="btn btn-primary" onclick="addCate()">Thêm danh mục</button>
+                            <a href="/admin/admin_categories" class="btn btn-secondary">Hủy</a>
+                        </div>
+                    </form>
+                    <!-- Thông báo phản hồi -->
+                    <div id="responseMessage" style="margin-top: 20px; display: none;">
+                        <p id="responseText"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<div th:replace="admin/fragments/script :: script"></div>
+
+<script type="text/javascript">
+    // Hiển thị ảnh xem trước
+    function chooseFile(fileInput) {
+        if (fileInput.files && fileInput.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('imagesPreview').src = e.target.result; // Hiển thị ảnh đã chọn
+            };
+            reader.readAsDataURL(fileInput.files[0]); // Đọc file ảnh
+        }
+    }
+
+    // Hàm gửi yêu cầu thêm danh mục
+    function addCate() {
+        const form = document.getElementById('addCategoryForm');
+        const formData = new FormData(form);
+
+        fetch('/admin/add-category', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Hiển thị phản hồi JSON
+                const responseMessage = document.getElementById('responseMessage');
+                const responseText = document.getElementById('responseText');
+
+                responseMessage.style.display = 'block';
+                if (data.success) {
+                    responseMessage.style.color = 'green';
+                    responseText.textContent = data.message;
+
+                    // Chuyển hướng về /admin/admin_categories sau 2 giây
+                    setTimeout(() => {
+                        window.location.href = "/admin/admin_categories";
+                    }, 2000); // 2 giây
+                } else {
+                    responseMessage.style.color = 'red';
+                    responseText.textContent = 'Thêm danh mục thất bại: ' + data.message;
+                }
+            })
+            .catch(error => {
+                // Hiển thị lỗi nếu có
+                const responseMessage = document.getElementById('responseMessage');
+                const responseText = document.getElementById('responseText');
+
+                responseMessage.style.display = 'block';
+                responseMessage.style.color = 'red';
+                responseText.textContent = 'Lỗi xảy ra: ' + error.message;
+            });
+    }
+</script>
+</body>
+<div th:replace="admin/fragments/footer :: footer"></div>
+</html>

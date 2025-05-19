@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+   <title>Thanh toán QR</title>
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+   
+   <style>
+       .payment-container {
+           max-width: 500px;
+           margin: 50px auto;
+           padding: 30px;
+           background: white;
+           border-radius: 15px;
+           box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+           text-align: center;
+       }
+
+       .qr-code {
+           margin: 20px 0;
+           padding: 20px;
+           background: #f8f9fa;
+           border-radius: 10px;
+       }
+
+       .amount {
+           font-size: 24px;
+           color: #4CAF50;
+           font-weight: bold;
+           margin: 20px 0;
+       }
+
+       .bank-info {
+           background: #f8f9fa;
+           padding: 15px;
+           border-radius: 8px;
+           margin-top: 20px;
+           text-align: left;
+       }
+
+       .bank-info p {
+           margin: 5px 0;
+           font-size: 14px;
+       }
+
+       .bank-info strong {
+           color: #333;
+       }
+
+       .timer {
+           font-size: 18px;
+           color: #666;
+           margin: 20px 0;
+       }
+
+       .success-message {
+           background: #4CAF50;
+           color: white;
+           padding: 15px;
+           border-radius: 8px;
+           margin-top: 20px;
+           animation: slideIn 0.5s ease;
+           display: none;
+       }
+
+       @keyframes slideIn {
+           from {
+               transform: translateY(-20px);
+               opacity: 0;
+           }
+           to {
+               transform: translateY(0);
+               opacity: 1;
+           }
+       }
+
+       .btn-return {
+           background: #4CAF50;
+           color: white;
+           padding: 10px 25px;
+           border-radius: 25px;
+           border: none;
+           margin-top: 20px;
+           transition: all 0.3s ease;
+       }
+
+       .btn-return:hover {
+           transform: translateY(-2px);
+           box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+       }
+   </style>
+</head>
+<body>
+   <div class="payment-container">
+       <h2>Thanh toán đơn hàng</h2>
+       
+       <div class="amount">
+           Số tiền: <span th:text="${#numbers.formatDecimal(amount, 0, 'COMMA', 0, 'POINT')}">0</span> VNĐ
+       </div>
+
+       <div class="qr-code">
+           <img th:src="@{/payment/generate-bank-qr(amount=${amount},orderId=${orderId})}" 
+                alt="Bank QR Code" style="width: 300px; height: 300px;">
+                
+           <div class="bank-info mt-3">
+               <p><strong>Thông tin chuyển khoản:</strong></p>
+               <p>Ngân hàng: Vietcombank</p>
+               <p>Số tài khoản: 1022576784</p>
+               <p>Chủ tài khoản: NGO THANH THANG</p>
+               <p>Số tiền: <span th:text="${#numbers.formatDecimal(amount, 0, 'COMMA', 0, 'POINT')}">0</span> VNĐ</p>
+               <p>Nội dung: Thanh toan don hang <span th:text="${orderId}"></span></p>
+           </div>
+       </div>
+
+       <div class="timer">
+           Thời gian còn lại: <span id="countdown">10:00</span>
+       </div>
+
+       <div id="paymentStatus" class="success-message"></div>
+
+       <a href="/order/purchase" class="btn btn-return">
+           <i class="fas fa-arrow-left me-2"></i>Quay lại đơn hàng
+       </a>
+   </div>
+
+   <script>
+       let timeLeft = 600; // 10 phút
+       const countdownEl = document.getElementById('countdown');
+       const statusEl = document.getElementById('paymentStatus');
+       const orderId = [[${orderId}]];
+
+       // Đếm ngược thời gian
+       const timer = setInterval(() => {
+           const minutes = Math.floor(timeLeft / 60);
+           const seconds = timeLeft % 60;
+           countdownEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+           
+           if (timeLeft <= 0) {
+               clearInterval(timer);
+               window.location.href = '/order/purchase';
+           }
+           timeLeft--;
+       }, 1000);
+
+       // Kiểm tra trạng thái thanh toán
+       function checkPaymentStatus() {
+           fetch(`/payment/check-status?orderId=${orderId}`)
+               .then(response => response.json())
+               .then(data => {
+                   if (data.status === 'completed') {
+                       statusEl.style.display = 'block';
+                       statusEl.textContent = 'Thanh toán thành công!';
+                       setTimeout(() => {
+                           window.location.href = '/order/purchase';
+                       }, 2000);
+                   }
+               });
+       }
+
+       // Kiểm tra mỗi 5 giây
+       setInterval(checkPaymentStatus, 5000);
+   </script>
+</body>
+</html>

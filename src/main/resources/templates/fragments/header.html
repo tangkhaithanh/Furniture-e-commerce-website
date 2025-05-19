@@ -1,0 +1,113 @@
+<head>
+    <!-- Thêm Bootstrap Icons nếu chưa có -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+    border-color: #e0a800;
+}
+
+.btn-warning .badge {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+}
+
+/* Khi hover vào giỏ hàng */
+.navbar .btn-cart:hover {
+    background-color: #e0a800;
+    color: #fff;
+    text-decoration: none; /* Không gạch chân khi hover */
+}
+
+/* Đảm bảo màu chữ của giỏ hàng và badge giống nhau */
+.navbar .btn-cart .fs-5 {
+    color: inherit;  /* Thừa kế màu chữ từ btn-cart */
+    margin-right: 0.5rem; /* Khoảng cách giữa "Giỏ hàng" và số lượng */
+}
+
+    </style>
+</head>
+
+<header>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <!-- Logo -->
+            <a class="navbar-brand" href="#">
+                <img src="/images/logo.png" alt="My Store" style="height: 40px;">
+                <span class="ms-2">My Furniture Store</span>
+            </a>
+
+            <!-- Thanh tìm kiếm -->
+            <form class="d-flex ms-auto" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-light" type="submit">
+                    <span>Search</span> <!-- Thay icon bằng văn bản -->
+                </button>
+            </form>
+
+            <!-- Các phần tử: Thông báo, Hỗ trợ, Giỏ hàng -->
+            <div class="d-flex ms-3">
+                <!-- Thông báo -->
+                <div class="me-3">
+                    <a href="#" class="text-light">
+                        <span class="fs-5">Thông báo</span> <!-- Thay icon bằng văn bản -->
+                    </a>
+                </div>
+                <!-- Hỗ trợ -->
+                <div class="me-3">
+                    <a href="#" class="text-light">
+                        <span class="fs-5">Hỗ trợ</span> <!-- Thay icon bằng văn bản -->
+                    </a>
+                </div>
+                <!-- Tài khoản của tôi -->
+                <div class="me-3">
+                    <a href="/address/info" class="text-light">
+                        <i class="bi bi-person-circle fs-5"></i> <!-- Biểu tượng tài khoản -->
+                        <span class="ms-2">Tài khoản của tôi</span>
+                    </a>
+                </div>
+<a href="/cart/view" class="btn btn-warning position-relative">
+  <img src="images/shopping-cart-icon.png" alt="Shopping Cart" class="me-2" />
+
+<span id="cartItemCount" class="badge bg-danger position-absolute top-0 start-100 translate-middle"></span>
+</a>
+            </div>
+        </div>
+    </nav>
+    <section class="hero">
+        <div class="container">
+            <div class="intro-excerpt">
+                <h1>Welcome to My Store</h1>
+                <p>Discover the latest products and trends.</p>
+            </div>
+            
+        </div>
+    </section>
+</header>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Gọi API để lấy giỏ hàng của người dùng
+    fetch('/cart/user-cart', {
+        method: 'GET',
+    })
+    .then(response => response.json()) // Giả sử server trả về JSON chứa giỏ hàng
+    .then(data => {
+        if (data.cartItems) {
+            // Cập nhật giao diện giỏ hàng (số lượng sản phẩm trong giỏ hàng)
+            const badge = document.getElementById("cartItemCount");
+            badge.textContent = data.cartItems.length; // Cập nhật số lượng sản phẩm
+        }
+    })
+    .catch(error => {
+        console.error('Có lỗi khi lấy giỏ hàng:', error);
+    });
+});
+
+
+</script>

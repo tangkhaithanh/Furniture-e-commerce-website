@@ -1,0 +1,708 @@
+	<!DOCTYPE html>
+	<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+	<head>
+	    <meta charset="UTF-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	    <title>Chi tiết sản phẩm</title>
+	
+	    <!-- Kết nối với Bootstrap CSS -->
+	    <link rel="stylesheet" href="/css/style.css">
+    	<link rel="stylesheet" href="/css/dep.css">
+    	<!-- Kết nối với Bootstrap CSS -->
+    	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    	<!-- Bootstrap Icons -->
+    	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+   	 	<!-- Google Fonts -->
+    	<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+	    <!-- Kết nối với FontAwesome CSS để sử dụng sao -->
+	    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+		<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500&display=swap" rel="stylesheet">
+
+		<style>
+	    .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1000;
+    background: rgba(44, 62, 80, 0.95) !important; /* Thêm độ trong suốt nhẹ */
+    backdrop-filter: blur(10px); /* Hiệu ứng blur cho background */
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+/* Product Image Container */
+.col-md-6:first-child {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Product Image */
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    background: white;
+    margin: 0 auto; /* Căn giữa theo chiều ngang */
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+/* Like section styling */
+.text-center.mt-3 {
+    margin-top: 1rem;
+    width: 100%;
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+/* Container cho phần chi tiết sản phẩm */
+.container.mt-5 {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+	        /* Định dạng phần đánh giá */
+	        .review-card {
+	            background-color: #f8f9fa;
+	            padding: 20px;
+	            border-radius: 8px;
+	            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	        }
+	
+	        /* Định dạng mỗi đánh giá */
+	        .review {
+	            background-color: #ffffff;
+	            padding: 15px;
+	            margin-bottom: 20px; /* Khoảng cách giữa các đánh giá */
+	            border-radius: 8px;
+	            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	        }
+				/* Định dạng header */
+			.review-header {
+			    display: flex;
+			    justify-content: flex-start; /* Đảm bảo các phần tử căn trái */
+			    align-items: center;
+			    margin-bottom: 10px;
+			}
+	        .review-footer {
+	            font-size: 0.9em;
+	            color: #6c757d;
+	        }
+	
+	        .review .stars i {
+	            color: #ffcc00; /* Màu vàng cho sao */
+	        }
+	
+	        /* Định dạng phần sao dưới tên sản phẩm */
+	        .stars i {
+	            color: #ffcc00; /* Màu vàng cho sao */
+	        }
+	
+	        .product-info {
+	            font-weight: bold; /* In đậm cho con số đánh giá */
+	        }
+	        /* Định dạng cho sao trống */
+			.far.fa-star {
+			    color: #ccc; /* Màu xám cho sao trống */
+			}
+			
+			/* Định dạng cho sao đầy */
+			.fas.fa-star {
+			    color: #ffcc00; /* Màu vàng cho sao đầy */
+			}
+			
+			/* Định dạng cho sao rưỡi */
+			.fas.fa-star-half-alt {
+			    color: #ffcc00; /* Màu vàng cho sao rưỡi */
+			}
+			/* Nút like mặc định */
+			#likeButton {
+			    color: #ccc;  /* Màu xám khi chưa like */
+			    cursor: pointer;
+			    border: 2px solid #ccc;
+			    padding: 5px 10px;
+			    border-radius: 25px;
+			}
+			
+			/* Nút like khi đã like */
+			#likeButton.liked {
+			    color: #ff4500;  /* Màu cam nổi bật khi đã like */
+			    border-color: #ff4500;
+			}
+			/* Container cho ảnh và video nằm ngang */
+			.review-media-container {
+			    display: flex;       /* Đảm bảo phần tử con nằm ngang */
+			    gap: 10px;           /* Khoảng cách giữa ảnh và video */
+			    align-items: center; /* Căn giữa ảnh và video theo chiều dọc */
+			    flex-wrap: nowrap;   /* Đảm bảo chúng không bị cuộn xuống dòng mới */
+			}
+			
+			/* Đảm bảo kích thước ảnh và video */
+			.review-media img, .review-media video {
+			    width: 150px;         /* Chiều rộng cố định */
+			    height: 150px;        /* Chiều cao cố định */
+			    object-fit: cover;    /* Đảm bảo không bị biến dạng */
+			    border-radius: 8px;   /* Bo góc */
+			}
+			.fly-item {
+    position: fixed;
+    z-index: 9999;
+    pointer-events: none;
+    animation: flyToCart 1s ease-in-out;
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+@keyframes flyToCart {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    70% {
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(0.1);
+        opacity: 0.1;
+    }
+}
+
+.cart-button {
+    transition: transform 0.3s ease;
+}
+
+.cart-button.bump {
+    animation: cartBump 0.3s ease-out;
+}
+
+@keyframes cartBump {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.success-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #28a745;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 5px;
+    animation: slideIn 0.5s ease-out;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+.cart-wrapper {
+    position: relative;
+}
+
+.cart-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 320px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    padding: 10px;
+}
+/* Định dạng cho sao vàng */
+.stars .fas.fa-star {
+    color: #ffcc00;  /* Màu vàng cho sao đã chọn */
+}
+
+/* Định dạng cho sao trống */
+.stars .far.fa-star {
+    color: #ccc;  /* Màu xám cho sao trống */
+}
+.notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 400px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.nav-item:hover .notification-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.notification-header {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    font-weight: 600;
+}
+
+.notification-content {
+    padding: 20px;
+    text-align: center;
+}
+
+.notification-empty-icon {
+    font-size: 40px;
+    color: #cbd5e0;
+    margin-bottom: 10px;
+}
+
+.notification-empty-text {
+    color: #718096;
+    font-size: 14px;
+}
+
+	    </style>
+	</head>
+	<body>
+<header>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/categories}">
+    <i class="bi bi-house-heart-fill" style="font-size: 2rem; color: #ffc107;"></i>
+    <span class="ms-2">My Furniture Store</span>
+</a>
+            <!-- Navigation Items -->
+			<div class="d-flex ms-3 nav-items">
+				<div class="nav-item">
+					<a th:if="${session.user0 != null}" href="" class="nav-link">
+						<i class="bi bi-bell-fill"></i>
+						<span class="nav-text">Thông báo</span>
+						<span class="notification-dot"></span>
+					</a>
+					<!-- Dropdown thông báo -->
+					<div class="notification-dropdown">
+						<div class="notification-header">
+							Thông Báo Mới Nhận
+						</div>
+						<div class="notification-content">
+							<i class="bi bi-bell-slash notification-empty-icon"></i>
+							<p class="notification-empty-text">Bạn chưa có thông báo nào</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Hỗ trợ -->
+				<div class="nav-item">
+					<a href="/contact" class="nav-link" target="_blank">  <!-- Thêm target="_blank" để mở tab mới -->
+						<i class="bi bi-headset"></i>
+						<span class="nav-text">Hỗ trợ</span>
+					</a>
+				</div>
+
+				<div class="nav-item">
+				    <a href="/address/info" class="nav-link">
+				        <i class="bi bi-geo-alt"></i>
+				        <span class="nav-text">Địa chỉ</span>
+				    </a>
+				</div>
+
+				<div class="nav-item cart-wrapper">
+					<a th:if="${session.user0 != null}" href="/cart/view" class="cart-button">
+						<i class="bi bi-cart3"></i>
+						<span class="nav-text">Giỏ hàng</span>
+						<span id="cartItemCount" class="cart-badge"></span>
+					</a>
+					<a th:unless="${session.user0 != null}" href="/users/login" class="cart-button">
+						<i class="bi bi-cart3"></i>
+						<span class="nav-text">Giỏ hàng</span>
+					</a>
+
+					<!-- Dropdown menu cho giỏ hàng -->
+					<div class="cart-dropdown">
+						<div class="cart-items" id="cartItemsList">
+							<!-- Các sản phẩm sẽ được thêm vào đây qua JavaScript -->
+						</div>
+						<div class="cart-footer">
+							<a href="/cart/view" class="btn btn-primary w-100">Xem giỏ hàng</a>
+						</div>
+					</div>
+				</div>
+				<div class="nav-item">
+					<a th:if="${session.user0 != null}" href="/order/purchase" class="nav-link">
+						<i class="bi bi-bag-check"></i>
+						<span class="nav-text">Đơn mua</span>
+					</a>
+					<a th:unless="${session.user0 != null}" href="/users/login" class="nav-link">
+						<i class="bi bi-bag-check"></i>
+						<span class="nav-text">Đơn mua</span>
+					</a>
+				</div>
+				<!-- Logout -->
+				<div class="nav-item">
+					<a th:if="${session.user0 != null}" href="/users/logout" class="nav-link">
+						<i class="bi bi-box-arrow-right"></i>
+						<span class="nav-text">Đăng xuất</span>
+					</a>
+					<a th:unless="${session.user0 != null}" href="/users/login" class="nav-link">
+						<i class="bi bi-box-arrow-in-right"></i>
+						<span class="nav-text">Đăng nhập</span>
+					</a>
+				</div>
+			</div>
+        </div>
+    </nav>
+    <section class="hero position-relative">
+	    <div class="container">
+	        <div class="position-absolute top-1 end-0 m-3" th:if="${session.userName != null}">
+	            <a href="/profile" class="nav-link text-white">
+	                <i class="bi bi-person-fill"></i>
+	                <span class="nav-text">Xin chào, <span th:text="${session.userName}">Username</span></span>
+	            </a>
+	        </div>
+	        <div class="intro-excerpt">
+	            <h1>Welcome to My Store</h1>
+	            <p>Discover the latest products and trends.</p>
+	        </div>
+	    </div>
+	</section>
+</header>
+	
+	    <!-- Chi tiết sản phẩm -->
+	    <div class="container mt-5">
+	        <div class="row">
+	            <div class="col-md-6">
+	                <img th:src="@{${product.imageUrl}}" alt="Hình ảnh sản phẩm" class="img-fluid" />
+	                <!-- Hiển thị số lượt thích -->
+					<div class="text-center mt-3">
+					    <!-- Kiểm tra xem người dùng đã like chưa -->
+					    <i class="fas fa-thumbs-up" id="likeButton" 
+					        onclick="likeProduct()" 
+					        th:classappend="${isLiked} ? 'liked' : ''"></i> <!-- Nút like sáng nếu đã like -->
+					    <span id="likeCount" th:text="${totalLikes}">0</span> Lượt thích
+					</div>
+
+	            </div>
+	            <div class="col-md-6">
+	                <h1 th:text="${product.name}"></h1>
+	                <!-- Hiển thị điểm trung bình và sao đánh giá -->
+	                 <div class="d-flex align-items-center">
+	                 <span class="product-info" th:text="${averageRating}"></span>
+	                    <div class="stars ms-2">
+						    <!-- Hiển thị sao đầy -->
+						    <i class="fas fa-star" th:each="i : ${#numbers.sequence(1, 5)}" 
+						       th:if="${i <= T(java.lang.Math).floor(averageRating)}"></i>
+						
+						    <!-- Hiển thị sao rưỡi -->
+						    <i class="fas fa-star-half-alt" 
+						       th:if="${averageRating - T(java.lang.Math).floor(averageRating) > 0}"></i>
+						
+						    <!-- Hiển thị sao trống -->
+						    <i class="far fa-star" th:each="i : ${#numbers.sequence(1, 5)}" 
+						       th:if="${i > T(java.lang.Math).ceil(averageRating)}"></i>
+						</div>
+    
+	                    <span>&nbsp;</span>
+	                    <span>|</span>
+	                    <span>&nbsp;</span>
+	            		<span class="product-info" th:text=" ${totalReviews} ">0</span> <span>&nbsp;</span> Đánh Giá <!-- In đậm số đánh giá -->
+	            		
+	            		<span>&nbsp;</span>
+	                    <span>|</span>
+	                    <span>&nbsp;</span>
+	            		<span class="product-info" th:text=" ${totalSoldQuantity} ">0</span> <span>&nbsp;</span> Đã Bán
+	                </div>
+	                
+	                <!-- Mô tả sản phẩm -->
+	                <p th:text="${product.description}">Mô tả sản phẩm sẽ hiển thị ở đây</p>
+	
+	                <!-- Giá sản phẩm -->
+	                <p class="h4 text-success" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')}+ ' VNĐ'">Giá: 0</p>
+					
+					<!-- Phần chọn số lượng -->
+					<div class="d-flex align-items-center">
+				    <!-- Nút giảm số lượng -->
+				    <button class="btn btn-outline-secondary" id="decreaseBtn">-</button>
+				
+				    <!-- Ô nhập liệu cho số lượng sản phẩm -->
+				    <input type="number" name="quantityInput" id="quantityInput" class="form-control text-center mx-2" value="1" min="1" style="width: 80px;">
+				
+				    <!-- Nút tăng số lượng -->
+				    <button class="btn btn-outline-secondary" id="increaseBtn">+</button>
+				    <span>&nbsp;</span>
+	                    <span>|</span>
+	                    <span>&nbsp;</span>
+				     <span class="product-info" th:text=" ${product.quantity} ">0</span> <span>&nbsp;</span> số lượng có sẵn
+				</div>
+	
+	                <!-- Form thêm vào giỏ hàng -->
+					<form id="addToCartForm">
+					    <input type="hidden" name="userId" id="userId" value="1"> <!-- userId -->
+					    <input type="hidden" name="productId" id="productId" value="${1}"> <!-- productId -->
+					    <!-- Nút thêm vào giỏ hàng với biểu tượng giỏ hàng -->
+						<!-- <button class="btn btn-primary mt-3" onclick="addToCart()">
+						    <i class="fas fa-shopping-cart"></i> Thêm vào giỏ hàng
+						</button> -->
+						<button type="button" class="fas fa-shopping-cart btn btn-primary mt-3" onclick="addToCart()">Thêm vào giỏ hàng</button>
+
+					</form>
+					
+					<!-- Thông báo sau khi thêm vào giỏ hàng -->
+					<div id="message"></div>
+	            </div>
+	        </div>
+	
+	        <!-- Phần Đánh giá sản phẩm -->
+	        <div class="container mt-5">
+	            <div class="review-card">
+	                <h3>Đánh giá của khách hàng</h3>
+	                <div th:each="review : ${product.reviews}" class="review">
+	                    <div class="review-header">
+	                        <strong th:text="${review.user.username}"></strong><br>
+	                        <span>&nbsp;</span>
+	                    <span>|</span>
+	                    <span>&nbsp;</span>
+							<div class="stars">
+								<!-- Hiển thị sao vàng dựa trên rating -->
+								<th:block th:each="i : ${#numbers.sequence(1, 5)}">
+									<i th:class="${i <= review.rating} ? 'fas fa-star' : 'far fa-star'"></i>
+								</th:block>
+							</div>
+	                    </div>
+	                    <p th:text="${review.reviewText}"></p>
+	                    <!-- Phần hiển thị ảnh/video -->
+							<div th:if="${review.imageUrl != null || review.videoUrl != null}" class="review-media-container d-flex">
+							    <!-- Hiển thị ảnh -->
+							    <div th:if="${review.imageUrl != null}" class="review-media">
+							        <img th:src="@{${review.imageUrl}}" alt="Ảnh Đánh Giá" class="img-fluid">
+							    </div>
+							
+							    <!-- Hiển thị video -->
+							    <div th:if="${review.videoUrl != null}" class="review-media">
+							        <video controls class="img-fluid">
+							            <source th:src="@{${review.videoUrl}}" type="video/mp4">
+							        </video>
+							    </div>
+							</div>
+                    <div class="review-footer">
+	                        <span th:text="${#dates.format(review.createdAt, 'yyyy-MM-dd HH:mm')}">Ngày: 12/12/2024</span>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	
+	    </div>
+	
+	    <!-- JavaScript: Cập nhật lượt thích -->
+	    <script>
+        // JavaScript để thay đổi số lượng
+        const decreaseBtn = document.getElementById('decreaseBtn');
+        const increaseBtn = document.getElementById('increaseBtn');
+        const quantityInput = document.getElementById('quantityInput');
+
+        // Giảm số lượng
+        decreaseBtn.addEventListener('click', function() {
+            let currentQuantity = parseInt(quantityInput.value);
+            if (currentQuantity > 1) {
+                quantityInput.value = currentQuantity - 1;
+            }
+        });
+
+        // Tăng số lượng
+        increaseBtn.addEventListener('click', function() {
+            let currentQuantity = parseInt(quantityInput.value);
+            let maxQuantity = [[${product.quantity}]];
+            if (currentQuantity < maxQuantity) {
+                quantityInput.value = currentQuantity + 1;
+            } else {
+                quantityInput.value = maxQuantity;
+                alert('Số lượng bạn chọn đã đạt mức tối đa của sản phẩm này');
+            }
+        });
+     // Kiểm tra số lượng ngay khi người dùng nhập
+        quantityInput.addEventListener('input', function() {
+            let enteredQuantity = parseInt(quantityInput.value) || 1;
+            let maxQuantity = [[${product.quantity}]]; // Lấy số lượng sản phẩm từ Thymeleaf
+
+            if (enteredQuantity <=0) {
+            	quantityInput.value = 1;
+                setTimeout(() => {
+                    alert('Số lượng phải lớn hơn 1');
+                }, 100);
+                
+            } else if (enteredQuantity > maxQuantity) {
+                quantityInput.value = maxQuantity;
+                setTimeout(() => {
+                    alert('Số lượng bạn chọn đã đạt mức tối đa của sản phẩm này');
+                }, 100);
+            }
+        });
+     // Hàm lấy giá trị productId từ URL
+        function getProductIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('productId');
+        }
+
+     // Cập nhật lại hàm addToCart
+        function addToCart() {
+            var userId = document.getElementById("userId").value;
+            var productId = getProductIdFromUrl();
+            var quantity = document.getElementById("quantityInput").value;
+            
+            // Tạo hiệu ứng bay vào giỏ hàng
+            const productImage = document.querySelector('.img-fluid').cloneNode(true);
+            const startRect = document.querySelector('.img-fluid').getBoundingClientRect();
+            const cartIcon = document.querySelector('.cart-button');
+            const endRect = cartIcon.getBoundingClientRect();
+            
+            // Tạo phần tử bay
+            const flyingImage = document.createElement('img');
+            flyingImage.src = productImage.src;
+            flyingImage.className = 'fly-item';
+            flyingImage.style.position = 'fixed';
+            flyingImage.style.left = `${startRect.left}px`;
+            flyingImage.style.top = `${startRect.top}px`;
+            document.body.appendChild(flyingImage);
+
+            // Tính toán đường bay
+            const flyingAnim = flyingImage.animate([
+                {
+                    top: `${startRect.top}px`,
+                    left: `${startRect.left}px`,
+                    width: '200px',
+                    height: '200px',
+                    opacity: 1
+                },
+                {
+                    top: `${endRect.top}px`,
+                    left: `${endRect.left}px`,
+                    width: '20px',
+                    height: '20px',
+                    opacity: 0
+                }
+            ], {
+                duration: 1000,
+                easing: 'ease-in-out'
+            });
+
+            // Gửi request đến server
+			fetch("/cart/cart/add?productId=" + productId + "&quantity=" + quantity, {
+                method: "POST"
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Xử lý sau khi animation kết thúc
+                flyingAnim.onfinish = () => {
+                    // Xóa hình ảnh bay
+                    document.body.removeChild(flyingImage);
+                    
+                    // Hiệu ứng giỏ hàng nhảy lên
+                    cartIcon.classList.add('bump');
+                    setTimeout(() => cartIcon.classList.remove('bump'), 300);
+                    
+                    // Hiển thị thông báo thành công
+                    showSuccessMessage(data);
+                    
+                    // Cập nhật số lượng trong giỏ hàng
+                    updateCartCount();
+                };
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorMessage("Có lỗi xảy ra. Vui lòng thử lại.");
+            });
+        }
+
+        // Hàm hiển thị thông báo thành công
+        function showSuccessMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'success-message';
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.style.animation = 'slideOut 0.5s ease-in forwards';
+                setTimeout(() => document.body.removeChild(messageDiv), 500);
+            }, 2000);
+        }
+
+        // Hàm cập nhật số lượng giỏ hàng (từ file cart-badge.js)
+        function updateCartCount() {
+            fetch('/api/cart/count')
+                .then(response => response.json())
+                .then(count => {
+                    const cartBadge = document.getElementById('cartItemCount');
+                    if (count > 0) {
+                        cartBadge.textContent = count;
+                        cartBadge.style.display = 'flex';
+                    } else {
+                        cartBadge.style.display = 'none';
+                    }
+                })
+                .catch(error => console.error('Error fetching cart count:', error));
+        }
+
+     // Hàm xử lý sự kiện nhấn nút like
+        function likeProduct() {
+            const productId = getProductIdFromUrl();  // Lấy productId từ URL
+
+            // Gửi yêu cầu tới server để xử lý like
+            fetch(`/like/product?productId=${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+            })
+            .then(response => response.text())
+            .then(data => {
+				if (data === 'redirect_to_login') {
+					// Nếu response trả về "redirect_to_login", chuyển hướng đến trang đăng nhập
+					window.location.href = '/users/login';
+				}
+				else {
+					// Cập nhật lại số lượt thích trên giao diện
+					document.getElementById('likeCount').textContent = data;  // Dữ liệu trả về là số lượt thích mới
+					document.getElementById('likeButton').classList.toggle('liked');  // Thêm/loại bỏ lớp liked để thay đổi màu sắc nút
+				}
+            })
+            .catch(error => {
+                console.error('Có lỗi khi thực hiện like:', error);
+            });
+        }
+
+
+        
+    </script>
+		
+	    <!-- Kết nối với Bootstrap JS -->
+	    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+	    <script th:src="@{/js/script.js}"></script>
+
+	
+	</body>
+	</html>

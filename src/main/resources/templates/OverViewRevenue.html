@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tổng Quan</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .dashboard-card {
+            transition: transform 0.3s ease-in-out;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background-color: #4e73df;
+            color: white;
+            font-weight: bold;
+            padding: 1rem;
+            border-bottom: none;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #4e73df;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #5a5c69;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #858796;
+        }
+        
+        .page-title {
+            color: #4e73df;
+            margin-bottom: 2rem;
+            font-weight: bold;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e3e6f0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Include navigation -->
+    <div th:replace="~{manageRevenue.html}"></div>
+
+    <div class="container mt-5">
+        <h1 class="page-title">
+            <i class="fas fa-chart-line me-2"></i>Tổng Quan
+        </h1>
+        <div class="row">
+            <!-- Tổng Số Đơn Hàng Đã Bán -->
+            <div class="col-md-3 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-header">
+                        <i class="fas fa-shopping-cart me-2"></i>Đơn hàng đã giao
+                    </div>
+                    <div class="card-body">
+                        <div class="stat-icon">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="stat-value" th:text="${totalOrders}"></div>
+                        <div class="stat-label">Đơn Hàng</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tổng Doanh Thu -->
+            <div class="col-md-3 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-header">
+                        <i class="fas fa-money-bill-wave me-2"></i>Tổng Doanh Thu
+                    </div>
+                    <div class="card-body">
+                        <div class="stat-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="stat-value" th:text="${#numbers.formatDecimal(totalRevenue, 0, 'COMMA', 0, 'POINT')}"></div>
+                        <div class="stat-label">VND</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mức Độ Hài Lòng -->
+            <div class="col-md-3 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-header">
+                        <i class="fas fa-smile me-2"></i>Mức Độ Hài Lòng
+                    </div>
+                    <div class="card-body">
+                        <div class="stat-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="stat-value" th:text="${customerSatisfaction}"></div>
+                        <div class="stat-label">Độ Hài Lòng</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

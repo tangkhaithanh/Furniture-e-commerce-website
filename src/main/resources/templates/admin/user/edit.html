@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/fragments/head :: head">
+    <title>Chỉnh sửa người dùng</title>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+    <div th:replace="admin/fragments/header :: header"></div>
+    <div th:replace="admin/fragments/sidebar :: sidebar"></div>
+
+    <div class="content-wrapper">
+        <section class="content-header">
+            <h1>Chỉnh sửa người dùng <small>Quản lý người dùng</small></h1>
+            <ol class="breadcrumb">
+                <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+                <li><a href="#">Người dùng</a></li>
+                <li class="active">Chỉnh sửa</li>
+            </ol>
+        </section>
+
+        <section class="content">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Thông tin người dùng</h3>
+                </div>
+
+                <form role="form" method="post" 
+                      th:action="@{/admin/edit-user/{id}(id=${user.userId})}" 
+                      th:object="${user}">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label for="username">Tên đăng nhập <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="username" name="username"
+                                   th:value="*{username}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                   th:value="*{email}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">Mật khẩu</label>
+                            <input type="password" class="form-control" id="password" name="password"
+                                   placeholder="Để trống nếu không muốn thay đổi mật khẩu">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="role">Vai trò <span class="text-danger">*</span></label>
+                            <select class="form-control" id="role" name="role" required>
+                                <option value="ADMIN" th:selected="${user.role.name == 'ADMIN'}">Admin</option>
+                                <option value="USER" th:selected="${user.role.name == 'USER'}">User</option>
+                                <option value="VENDOR" th:selected="${user.role.name == 'VENDOR'}">Vendor</option>
+                                <option value="SHIPPER" th:selected="${user.role.name == 'SHIPPER'}">Shipper</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Trạng thái</label>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="isActive" value="true" 
+                                           th:checked="${user.isActive == true}">
+                                    Hoạt động
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="isActive" value="false" 
+                                           th:checked="${user.isActive == false}">
+                                    Không hoạt động
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        <a href="/admin/admin_users" class="btn btn-default">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <div th:replace="admin/fragments/footer :: footer"></div>
+</div>
+
+<div th:replace="admin/fragments/script :: script"></div>
+</body>
+</html>

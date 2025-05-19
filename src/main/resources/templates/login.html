@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <link
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet"
+  />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: #1a1a2e;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-container {
+      background-color: #242437;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      padding: 40px;
+      width: 400px;
+      animation: fadeIn 1s ease-in-out;
+    }
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .logo {
+      display: block;
+      margin: 0 auto 30px;
+      max-width: 150px;
+      animation: logoAnimation 1s ease-in-out infinite alternate;
+    }
+    @keyframes logoAnimation {
+      0% {
+        transform: scale(1);
+      }
+      100% {
+        transform: scale(1.1);
+      }
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #ffffff;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      color: #ffffff;
+    }
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #32324b;
+      font-size: 16px;
+      color: #ffffff;
+      transition: background-color 0.3s ease;
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      background-color: #4a4a6a;
+    }
+    .btn-login {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background-color: #0077b6;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    .btn-login:hover {
+      background-color: #023e8a;
+      transform: translateY(-2px);
+    }
+    .forgot-password {
+      display: block;
+      text-align: right;
+      margin-top: 10px;
+      color: #ffffff;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    .forgot-password:hover {
+      color: #0077b6;
+    }
+    .register-link {
+      text-align: center;
+      margin-top: 20px;
+      color: #ffffff;
+    }
+    .register-link a {
+      color: #0077b6;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    .register-link a:hover {
+      color: #023e8a;
+    }
+  </style>
+</head>
+<body>
+<div class="login-container">
+  <img
+          src="https://i.etsystatic.com/25493577/r/il/fcea59/3570208232/il_fullxfull.3570208232_1wn2.jpg"
+          alt="Logo"
+          class="logo"
+  />
+  <h2>Login</h2>
+  <form id="loginForm">
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" required />
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required />
+    </div>
+    <a href="/users/forgot-password" class="forgot-password"
+    >Forgot Password?</a
+    >
+    <button type="submit" class="btn-login">Login</button>
+  </form>
+  <div class="register-link">
+    Don't have an account? <a href="/users/register">Register Now</a>
+  </div>
+</div>
+
+<script>
+  document
+          .getElementById("loginForm")
+          .addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const formData = {
+              username: document.getElementById("username").value,
+              password: document.getElementById("password").value,
+            };
+
+            fetch("/users/login", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(formData),
+            })
+                    .then((response) => response.json())
+                    .then((data) => {
+                      if (data.token) {
+                        localStorage.setItem("authToken", data.token);
+
+                        // Lấy thông tin role từ response
+                        const role = data.role;  // Giả sử API trả về role của người dùng.
+
+                        // Điều hướng theo role
+                        if (role === "ADMIN") {
+                          window.location.href = "/admin/admin_categories";  // Điều hướng đến trang admin
+                        } else if (role === "USER") {
+                          window.location.href = "/categories";  // Điều hướng đến trang user
+                        } else if (role === "VENDOR") {
+                          window.location.href = "/vendor";  // Điều hướng đến trang vendor
+                        } else if (role === "SHIPPER") {
+                          window.location.href = "/shipper";  // Điều hướng đến trang vendor
+                        }
+
+                      } else {
+                        alert("Login failed: " + data.message);
+                      }
+                    })
+                    .catch((error) => {
+                      console.error("Error:", error);
+                      alert("Login failed. Please try again.");
+                    });
+          });
+</script>
+
+</body>
+</html>
